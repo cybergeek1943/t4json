@@ -3,8 +3,7 @@ import json
 
 class T4Json:
 
-    # optimization line
-    __slots__: tuple[str, str, str, str, str, str, str, str, str, str, str, str] = (
+    __slots__: tuple = (
         '__file_path__', 'ignore_method_errors', 'indentation', 'sort_keys', 'only_ascii', '__json_separators__',
         '__path_separator__', '__relative_path_command__', '__relative_back_path_command__',
         '__working_level__', '__root__', '__data__')
@@ -21,8 +20,8 @@ class T4Json:
         # off limit __vars__
         self.__json_separators__: tuple = (', ', ': ')  # index 0 is for items and index 1 is for JSON objects
         self.__path_separator__: str = '\\\\'
-        self.__relative_path_command__: str = '..'
-        self.__relative_back_path_command__: str = '../..'
+        self.__relative_path_command__: str = ''
+        self.__relative_back_path_command__: str = '..'
         self.__working_level__: str | None = None
         self.__root__: str = ''
 
@@ -57,7 +56,6 @@ class T4Json:
                         else:
                             data.update({k: v})
                     for k in duplicates:
-                        # self.change_value(f'{path}{self.__path_separator__}{k}', [self.read(path=f'{path}{self.__path_separator__}{k}'), duplicates[k]])
                         self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}',
                                  existing_keys=existing_keys, create=True, index=index, integrate_list_with_list=False)
                 elif existing_keys == 'integrate':
@@ -68,11 +66,6 @@ class T4Json:
                         else:
                             data.update({k: v})
                     for k in duplicates:
-                        # # incase a list that has the same key is being added to a container where the existing key holds a non-container value like str.
-                        # existing_duplicate_path: str = f'{path}{self.__path_separator__}{k}'
-                        # existing_duplicate_value: dict | list | str | float | int | bool | None = self.read(existing_duplicate_path)
-                        # if not isinstance(existing_duplicate_value, (list, dict)):
-                        #     self.change_value(existing_duplicate_value, [existing_duplicate_value])
                         self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}', existing_keys=existing_keys,
                                  create=True, index=index, integrate_list_with_list=True, ignore_errors=ignore_errors)
                 else:
@@ -862,8 +855,8 @@ class T4Json:
         # off limit __vars__
         self.__json_separators__: tuple = (', ', ': ')  # index 0 is for items and index 1 is for JSON objects
         self.__path_separator__: str = '\\\\'
-        self.__relative_path_command__: str = '..'
-        self.__relative_back_path_command__: str = '../..'
+        self.__relative_path_command__: str = ''
+        self.__relative_back_path_command__: str = '..'
         self.__working_level__: str | None = None
 
     def is_path_existent(self, path) -> bool:

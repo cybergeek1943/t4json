@@ -269,19 +269,19 @@ ___path___ should lead to the level in which you want to remove any __keys__ tha
 
 &emsp;
 ###### _T4Json._ ```overwrite(start)```
-This method can be used to start fresh. 🥕🍀🙂
+This method can be used to start fresh.
 
 ___start___ can be a __dictionary__, __list__, __tuple__ (which will be converted to a list), __string__,  __integer__,  __float__,  __boolean__, or __none__. All current data will be overwritten/replaced with ```start```.
 
 
 &emsp;
 ###### _T4Json._ ```wipe()``` or ```clear()```
-Simply deletes everything and leaves you with an empty container. 🙁
+Simply deletes everything and leaves you with an empty container.
 
 
 &emsp;
 ###### _T4Json._ ```format(indentation=4, sort_keys=True, only_ascii=False)```
-This method formats the json file to make it look nice. 🙁 ➡ 🙂
+This method formats the json file to make it look nice.
 
 ___indentation___ Sets the indentation amount of the json file.
 
