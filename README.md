@@ -21,7 +21,7 @@ Outline:
 - Easily open up json data - simply pass a File Path, URL, or Json String when creating the T4Json object, and it will automatically figure out what is what and give you the data you need to work with.
 - And more.
 
-T4json is designed to simply and easily work with json data without any hassle. It can be used to make simple quick changes, more complex changes, or to just retrieve data. All with only a few lines of code that are easy understand and read.
+T4json is designed to simply and easily work with json data without any hassle. It can be used to make simple quick changes, more complex changes, or to just retrieve data. All with only a few lines of code that are easy to understand and read.
 
 &emsp;
 
