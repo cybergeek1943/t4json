@@ -1067,8 +1067,9 @@ class T4Json:
 
         # main
         try:
-            if not path.startswith(self.__path_separator__) or self.is_path_relative(path):
-                parent_of_target_level: dict | list = self.__data__[self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
+            if not path_[0] == '':
+                parent_of_target_level: dict | list = self.__data__[
+                    self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
             else:
                 parent_of_target_level: dict = self.__data__  # level iterator... used to assign each level as it walks down the data structure.
 
@@ -1082,9 +1083,12 @@ class T4Json:
                     parent_of_target_level: dict | list = parent_of_target_level[int(key)]
 
             target_level_key: str = path_[-1]
+
             # Return level
 
-            def catch_invalid_path(target_key) -> any: return parent_of_target_level[target_key]
+            def catch_invalid_path(target_key) -> any:
+                return parent_of_target_level[target_key]
+
             if isinstance(parent_of_target_level, dict):
                 try:  # since the target level is not checked in the for loop check it here
                     catch_invalid_path(target_level_key)
@@ -1107,7 +1111,8 @@ class T4Json:
 
                 return parent_of_target_level, target_level_key
             else:  # elif - is list
-                catch_invalid_path(int(target_level_key))  # since the target level is not checked in the for loop check it here
+                catch_invalid_path(
+                    int(target_level_key))  # since the target level is not checked in the for loop check it here
                 return parent_of_target_level, int(target_level_key)
         except (KeyError, ValueError, TypeError):
             raise PathError
