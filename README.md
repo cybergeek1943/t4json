@@ -97,7 +97,7 @@ null | <--------------> | None
 
 &emsp;
 
-### Overview of Available T4Json Class Methods
+### Overview of T4Json Class Methods
 The parameters are not shown in the methods listed below.
 &nbsp;
 
