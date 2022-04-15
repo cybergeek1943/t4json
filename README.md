@@ -1,4 +1,4 @@
-# t4json
+# t4json Docs
 ![GitHub Workflow Status](https://raw.githubusercontent.com/cybergeek1943/badges/main/build-passing.svg) ![contributions welcome](https://raw.githubusercontent.com/cybergeek1943/badges/main/contributions-welcome.svg)
 
 The t4json module was created to make working with json files in python easier. It is
