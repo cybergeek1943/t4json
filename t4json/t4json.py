@@ -22,7 +22,7 @@ class T4Json:
         self.__path_separator__: str = '\\\\'
         self.__relative_path_command__: str = '.'
         self.__relative_back_path_command__: str = '..'
-        self.__working_level__: str or None = None
+        self.__working_level__: str = ''
         self.__root__: str = ''
 
         self.__data__: dict = {self.__root__: {}}
