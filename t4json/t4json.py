@@ -20,7 +20,7 @@ class T4Json:
         # off limit __vars__
         self.__json_separators__: tuple = (', ', ': ')  # index 0 is for items and index 1 is for JSON objects
         self.__path_separator__: str = '\\\\'
-        self.__relative_path_command__: str = ''
+        self.__relative_path_command__: str = '.'
         self.__relative_back_path_command__: str = '..'
         self.__working_level__: str or None = None
         self.__root__: str = ''
@@ -875,7 +875,9 @@ class T4Json:
         if path == '':
             return False
         else:
-            if path.startswith(self.__relative_back_path_command__ + self.__path_separator__) or path.startswith(self.__relative_path_command__ + self.__path_separator__):
+            if path in ('.', '..'):
+                return True
+            elif path.startswith(self.__relative_back_path_command__ + self.__path_separator__) or path.startswith(self.__relative_path_command__ + self.__path_separator__):
                 return True
             else:
                 return False
@@ -1006,6 +1008,10 @@ class T4Json:
         # parameter setup
         if working_level is None:
             working_level: str = self.__working_level__
+        if path == self.__relative_path_command__:
+            path: str = self.__working_level__
+        elif path == self.__relative_back_path_command__:
+            path: str = self.__working_level__.rpartition(self.__path_separator__)[0]
 
         # main
         back: str = self.__relative_back_path_command__ + self.__path_separator__
@@ -1022,7 +1028,6 @@ class T4Json:
                 out: list = working_level.split(self.__path_separator__)[:-left_count] + path.split(self.__path_separator__)[left_count:]
 
             elif path.startswith(working):  # if work at current working level
-
                 out: list = working_level.split(self.__path_separator__) + path.split(self.__path_separator__)[1:]
 
             else:  # if absolute path
@@ -1048,9 +1053,6 @@ class T4Json:
         # path setup
         path_: list = self.__interpret_path__(path)
 
-        if len(path_) == 1 and path_[0] == '':  # incase path is relative than and is leading to base.
-            return self.__data__, self.__root__
-
         # functions
         def alien_key(k: str) -> float or bool or None:
             try:
@@ -1068,8 +1070,7 @@ class T4Json:
         # main
         try:
             if not path_[0] == '':
-                parent_of_target_level: dict or list = self.__data__[
-                    self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
+                parent_of_target_level: dict or list = self.__data__[self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
             else:
                 parent_of_target_level: dict = self.__data__  # level iterator... used to assign each level as it walks down the data structure.
 
@@ -1083,12 +1084,9 @@ class T4Json:
                     parent_of_target_level: dict or list = parent_of_target_level[int(key)]
 
             target_level_key: str = path_[-1]
-
             # Return level
 
-            def catch_invalid_path(target_key) -> any:
-                return parent_of_target_level[target_key]
-
+            def catch_invalid_path(target_key) -> any: return parent_of_target_level[target_key]
             if isinstance(parent_of_target_level, dict):
                 try:  # since the target level is not checked in the for loop check it here
                     catch_invalid_path(target_level_key)
@@ -1111,10 +1109,9 @@ class T4Json:
 
                 return parent_of_target_level, target_level_key
             else:  # elif - is list
-                catch_invalid_path(
-                    int(target_level_key))  # since the target level is not checked in the for loop check it here
+                catch_invalid_path(int(target_level_key))  # since the target level is not checked in the for loop check it here
                 return parent_of_target_level, int(target_level_key)
-        except (KeyError, ValueError, TypeError):
+        except (KeyError, ValueError, TypeError, IndexError):
             raise PathError
 
 
