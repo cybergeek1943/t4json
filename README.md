@@ -3,7 +3,7 @@
 
 The t4json module was created to make working with json files in python easier. It is
 built on top of the standard json module that comes with python. It is pure python and
-does not have any non-standard [dependencies](https://en.wikipedia.org/wiki/Coupling_(computer_programming)). Therefore, it should work on a plain install of python 3
+does not have any non-standard [dependencies](https://en.wikipedia.org/wiki/Coupling_(computer_programming)). Therefore, it should work on a plain install of python 3.6
 or later on any OS right out of the box.
 
 Outline:
@@ -32,7 +32,7 @@ Using pip.
 pip install t4json
 ```
 
-Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json-python) and use as a local module within your project... which may be more useful if you want to make changes to it.
+Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json) and use as a local module within your project... which may be more useful if you want to make changes to it.
 
 &emsp;
 

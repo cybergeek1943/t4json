@@ -9,11 +9,11 @@ class T4Json:
         '__working_level__', '__root__', '__data__')
 
     def __init__(self, source: str = None, create: bool = False, encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
-        self.__file_path__: str | None = None  # used throughout the class to open, write and read to JSON files
+        self.__file_path__: str or None = None  # used throughout the class to open, write and read to JSON files
 
         # user_settings
         self.ignore_method_errors: bool = False
-        self.indentation: int | str | None = 4
+        self.indentation: int or str or None = 4
         self.sort_keys: bool = False
         self.only_ascii: bool = False
 
@@ -22,7 +22,7 @@ class T4Json:
         self.__path_separator__: str = '\\\\'
         self.__relative_path_command__: str = ''
         self.__relative_back_path_command__: str = '..'
-        self.__working_level__: str | None = None
+        self.__working_level__: str or None = None
         self.__root__: str = ''
 
         self.__data__: dict = {self.__root__: {}}
@@ -30,7 +30,7 @@ class T4Json:
         if source is not None:
             self.load(source=source, create=create, encoding=encoding, encoding_errors=encoding_errors)
 
-    def add(self, value: dict | list | str | float | int | bool | None, path: str = '', existing_keys: str = 'pass', create: bool = False, index: int | str | None = None, integrate_list_with_list: bool = False, ignore_errors: bool = None) -> None:
+    def add(self, value: dict or list or str or float or int or bool or None, path: str = '', existing_keys: str = 'pass', create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False, ignore_errors: bool = None) -> None:
         """Adds *value* to the base... or elsewhere if specified by *path*."""
 
         # parameter setup
@@ -41,7 +41,7 @@ class T4Json:
         # main
         try:
             data_: tuple = self.__walk_path__(path=path)
-            data: dict | list | str | float | int | bool | None = data_[0][data_[1]]
+            data: dict or list or str or float or int or bool or None = data_[0][data_[1]]
             if isinstance(data, dict):
                 if existing_keys == 'replace':
                     data.update(value)
@@ -121,7 +121,7 @@ class T4Json:
         except PathError:
             self.__raise_error__(PathError, ignore_errors)
 
-    def change_value(self, path: str, new_value: dict | list | str | float | int | bool | None,
+    def change_value(self, path: str, new_value: dict or list or str or float or int or bool or None,
                      ignore_errors: bool = None) -> None:
         """Changes the value of the key/index that *path* leads to."""
 
@@ -144,7 +144,7 @@ class T4Json:
         except PathError:
             self.__raise_error__(PathError, ignore_errors)
 
-    def change_key(self, path: str, new_key: str | int | float | bool | None, existing_key: str = 'error',
+    def change_key(self, path: str, new_key: str or int or float or bool or None, existing_key: str = 'error',
                    ignore_errors: bool = None) -> None:
         """Changes the key that *path* leads to."""
 
@@ -216,7 +216,7 @@ class T4Json:
             self.__raise_error__(PathError, ignore_errors)
 
     def move_from_to(self, from_path: str, to_path: str, only_contents: bool = False, existing_keys: str = 'combine',
-                     create: bool = False, index: int | str | None = None, integrate_list_with_list: bool = False,
+                     create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False,
                      ignore_errors: bool = None) -> None:
         """Moves data from *from_path* to *to_path*."""
 
@@ -227,7 +227,7 @@ class T4Json:
         # main
         try:
             if not to_path.startswith(from_path):
-                out: dict | str | list | int | float | bool | None = self.delete(from_path)
+                out: dict or str or list or int or float or bool or None = self.delete(from_path)
 
                 if only_contents:
                     self.add(value=out[0], path=to_path, existing_keys=existing_keys, create=create, index=index,
@@ -246,7 +246,7 @@ class T4Json:
             self.__raise_error__(error=PathError, ignore=ignore_errors)
 
     def copy_from_to(self, from_path: str, to_path: str, only_contents: bool = False, existing_keys: str = 'combine',
-                     create: bool = False, index: int | str | None = None, integrate_list_with_list: bool = False,
+                     create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False,
                      ignore_errors: bool = None) -> None:
         """Copy's data from *from_path* to *to_path*."""
 
@@ -274,7 +274,7 @@ class T4Json:
         except PathError:
             self.__raise_error__(error=PathError, ignore=ignore_errors)
 
-    def delete(self, path: str, ignore_errors: bool = None) -> tuple | None:
+    def delete(self, path: str, ignore_errors: bool = None) -> tuple or None:
         """Deletes the pair or item wherever *path* leads."""
 
         # For <self.move_from_to()> the output of this method must always be in the format of: (<value>, <key>)... the deleted key and value.
@@ -290,7 +290,7 @@ class T4Json:
         # main
         try:
             data: tuple = self.__walk_path__(path=path)
-            out: dict | str | list | int | float | bool | None = data[0].pop(data[1])
+            out: dict or str or list or int or float or bool or None = data[0].pop(data[1])
 
             if self.__working_level__.startswith(path):
                 if self.__path_separator__ in path:
@@ -312,7 +312,7 @@ class T4Json:
         # main
         try:
             data_: tuple = self.__walk_path__(path=path)
-            data: dict | list = data_[0][data_[1]]
+            data: dict or list = data_[0][data_[1]]
 
             if isinstance(data, dict):
                 for k in list(data):
@@ -333,12 +333,12 @@ class T4Json:
         except PathError:
             self.__raise_error__(error=PathError, ignore=ignore_errors, from_none=True)
 
-    def overwrite(self, new: dict | str | list | tuple | int | float | bool | None) -> None:
+    def overwrite(self, new: dict or str or list or tuple or int or float or bool or None) -> None:
         """Overwrites/replaces all the current data with *new*"""
 
         self.__data__[self.__root__] = new
         self.set_working_level('')
-        self.__file_path__: str | None = None
+        self.__file_path__: str or None = None
 
     def wipe(self) -> None:
         """Removes all data and leaves you with an empty dict."""
@@ -350,7 +350,7 @@ class T4Json:
 
         self.wipe()
 
-    def format(self, indentation: int | str | None = 4, sort_keys: bool = True, only_ascii: bool = False) -> None:
+    def format(self, indentation: int or str or None = 4, sort_keys: bool = True, only_ascii: bool = False) -> None:
         """This method formats the JSON file to make it look nice."""
 
         self.set_indentation(indentation)
@@ -360,7 +360,7 @@ class T4Json:
     def flatten(self, path: str = '', chain_key: bool = False, chain_include_index: bool = False,
                 chain_key_separator: str = '_', flatten_opposite_container_type: bool = True,
                 pull_pairs_from_lists: bool = True, pull_lists_from_pairs: bool = False,
-                existing_keys: str = 'integrate', list_index: int | str | None = None,
+                existing_keys: str = 'integrate', list_index: int or str or None = None,
                 delete_empty_containers: bool = True, ignore_errors: bool = None) -> None:
         """This method flattens nested data."""
 
@@ -374,7 +374,7 @@ class T4Json:
         # main
         try:
             data: tuple = self.__walk_path__(path)
-            container: dict | list = data[0][data[1]]
+            container: dict or list = data[0][data[1]]
             if isinstance(container, dict):
                 def recursive_func() -> None:
                     for key in container:
@@ -472,7 +472,7 @@ class T4Json:
         except PathError:
             self.__raise_error__(error=PathError, ignore=ignore_errors)
 
-    def read(self, path: str = '', ignore_errors: bool = None) -> dict | str | list | int | float | bool | None:
+    def read(self, path: str = '', ignore_errors: bool = None) -> dict or str or list or int or float or bool or None:
         """Returns the value of wherever *path* leads."""
 
         # parameter setup
@@ -486,7 +486,7 @@ class T4Json:
         except PathError:
             self.__raise_error__(PathError, ignore_errors)
 
-    def pair(self, path: str, as_dictionary: bool = False, ignore_errors: bool = None) -> tuple | dict:
+    def pair(self, path: str, as_dictionary: bool = False, ignore_errors: bool = None) -> tuple or dict:
         """Returns a pair in the form of a tuple (<key>, <value>) or dictionary pair {<key>: <value>}
         from wherever *path* leads."""
 
@@ -515,7 +515,7 @@ class T4Json:
         # main
         try:
             data_: tuple = self.__walk_path__(path=path)
-            data: dict | str | list | int | float | bool | None = data_[0][data_[1]]
+            data: dict or str or list or int or float or bool or None = data_[0][data_[1]]
             if isinstance(data, dict):
                 if as_dictionaries:
                     return [{k: v} for k, v in data.items()]
@@ -524,7 +524,7 @@ class T4Json:
         except PathError:
             self.__raise_error__(PathError, ignore_errors)
 
-    def key(self, path: str, ignore_errors: bool = None) -> str | int | float | bool | None:
+    def key(self, path: str, ignore_errors: bool = None) -> str or int or float or bool or None:
         """Returns the key of the value that *path* leads to. If the value is in a list the values index will be
         returned as an integer."""
 
@@ -568,7 +568,7 @@ class T4Json:
         # main
         try:
             data_: tuple = self.__walk_path__(path=path)
-            data: dict | str | list | int | float | bool | None = data_[0][data_[1]]
+            data: dict or str or list or int or float or bool or None = data_[0][data_[1]]
             if isinstance(data, dict):
                 return list(data.values())
             elif isinstance(data, list):
@@ -687,7 +687,7 @@ class T4Json:
             pass
 
     def search(self, key: str, path: str = '', search_list: bool = True,
-               ignore_errors: bool = None) -> list | dict | str | int | float | bool | None:
+               ignore_errors: bool = None) -> list or dict or str or int or float or bool or None:
         """Searches through all the JSON data or (past a certain point specified by *path*) for *key*. If there are
         multiple keys with the same name spread throughout the data, a list of their all there values will be returned."""
 
@@ -723,16 +723,16 @@ class T4Json:
         except AttributeError:
             pass
 
-    def json_string(self, path: str = '', indent: int | str = None, sort_keys: bool = None, only_ascii: bool = None,
+    def json_string(self, path: str = '', indent: int or str = None, sort_keys: bool = None, only_ascii: bool = None,
                     separators: tuple = None, ignore_errors: bool = None) -> str:
         """Returns a JSON formatted string. This string can then... for example be saved to a file."""
 
         if ignore_errors is None:
             ignore_errors: bool = self.ignore_method_errors
         if indent is None:
-            indent: int | str | None = self.indentation
+            indent: int or str or None = self.indentation
         if sort_keys is None:
-            sort_keys: bool | None = self.sort_keys
+            sort_keys: bool or None = self.sort_keys
         if only_ascii is None:
             only_ascii: bool = self.only_ascii
         if separators is None:
@@ -759,9 +759,9 @@ class T4Json:
         except PathError:
             self.__raise_error__(error=PathError, ignore=ignore_errors)
 
-    def set_indentation(self, indentation: int | str | None) -> None:
+    def set_indentation(self, indentation: int or str or None) -> None:
         """Sets the indentation of the JSON file which will be applied when it is saved/serialized."""
-        self.indentation: int | str | None = indentation
+        self.indentation: int or str or None = indentation
 
     def set_sort_keys(self, boolean: bool) -> None:
         """Keys will be sorted in alphabetical/numerical order. This will be applied when the file is saved/serialized."""
@@ -835,7 +835,7 @@ class T4Json:
         """Returns the current working level as a path."""
         return self.__working_level__
 
-    def get_indentation(self) -> int | str | None:
+    def get_indentation(self) -> int or str or None:
         """Returns the indentation property. An int, str or None can be expected."""
         return self.indentation
 
@@ -848,7 +848,7 @@ class T4Json:
 
         # user_settings
         self.ignore_method_errors: bool = False
-        self.indentation: int | str | None = 4
+        self.indentation: int or str or None = 4
         self.sort_keys: bool = False
         self.only_ascii: bool = False
 
@@ -857,7 +857,7 @@ class T4Json:
         self.__path_separator__: str = '\\\\'
         self.__relative_path_command__: str = ''
         self.__relative_back_path_command__: str = '..'
-        self.__working_level__: str | None = None
+        self.__working_level__: str or None = None
 
     def is_path_existent(self, path) -> bool:
         """Checks to see if *path* exist in the currently opened data structure. True is return if it
@@ -899,10 +899,10 @@ class T4Json:
 
         try:
             with open(file_path, 'r', encoding=encoding, errors=encoding_errors) as file:
-                data: dict | list = json.load(file)
+                data: dict or list = json.load(file)
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
-            self.__file_path__: str | None = None
+            self.__file_path__: str or None = None
         except FileNotFoundError:
             if create:
                 with open(file_path, 'w', encoding=encoding, errors=encoding_errors) as new_file:
@@ -919,10 +919,10 @@ class T4Json:
     def load_from_string(self, string: str) -> None:
         """Loads JSON data from a string."""
         try:
-            data: dict | list = json.loads(string)
+            data: dict or list = json.loads(string)
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
-            self.__file_path__: str | None = None
+            self.__file_path__: str or None = None
         except BaseException:
             raise LoadStringError(
                 '<string> is invalid json data.')
@@ -931,23 +931,23 @@ class T4Json:
         """Loads JSON data from the specified URL."""
         from urllib.request import urlopen
         try:
-            data: dict | list = json.loads(urlopen(url).read().decode(encoding=encoding, errors=encoding_errors))
+            data: dict or list = json.loads(urlopen(url).read().decode(encoding=encoding, errors=encoding_errors))
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
-            self.__file_path__: str | None = None
+            self.__file_path__: str or None = None
         except Exception:
             raise LoadURLError(
                 'json data could not be retrieved from <url>.')
 
-    def save(self, indent: int | str = None, sort_keys: bool = None, only_ascii: bool = None, separators: tuple = None,
+    def save(self, indent: int or str = None, sort_keys: bool = None, only_ascii: bool = None, separators: tuple = None,
              encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
         """Saves the currently opened file if a file is opened."""
 
         if self.__file_path__ is not None:
             if indent is None:
-                indent: int | str | None = self.indentation
+                indent: int or str or None = self.indentation
             if sort_keys is None:
-                sort_keys: bool | None = self.sort_keys
+                sort_keys: bool or None = self.sort_keys
             if only_ascii is None:
                 only_ascii: bool = self.only_ascii
             if separators is None:
@@ -956,15 +956,15 @@ class T4Json:
                 json.dump(obj=self.__data__[self.__root__], fp=file, skipkeys=True, indent=indent, sort_keys=sort_keys,
                           ensure_ascii=only_ascii, separators=separators)
 
-    def save_as(self, file_path: str, overwrite: bool = False, indent: int | str = None, sort_keys: bool = None,
+    def save_as(self, file_path: str, overwrite: bool = False, indent: int or str = None, sort_keys: bool = None,
                 only_ascii: bool = None, separators: tuple = None, encoding: str = 'utf-8',
                 encoding_errors: str = 'strict') -> None:
         """Saves the current JSON data as a new file."""
 
         if indent is None:
-            indent: int | str | None = self.indentation
+            indent: int or str or None = self.indentation
         if sort_keys is None:
-            sort_keys: bool | None = self.sort_keys
+            sort_keys: bool or None = self.sort_keys
         if only_ascii is None:
             only_ascii: bool = self.only_ascii
         if separators is None:
@@ -980,18 +980,18 @@ class T4Json:
                                   'if a file already does exist it will be overwritten and no exception will '
                                   'be thrown.')
 
-    def new(self, value: dict | str | list | tuple | int | float | bool | None) -> None:
+    def new(self, value: dict or str or list or tuple or int or float or bool or None) -> None:
         """Receives whatever is passed to *value* as the new JSON data to work with."""
 
         self.__data__[self.__root__] = value
         self.set_working_level('')
-        self.__file_path__: str | None = None
+        self.__file_path__: str or None = None
 
     def close(self) -> None:
         """Simply closes the data that's already open and leaves you with an empty dictionary."""
 
         self.new({})
-        self.__file_path__: str | None = None
+        self.__file_path__: str or None = None
 
     @staticmethod
     def __raise_error__(error: object, ignore: bool = False, from_none: bool = False) -> None:
@@ -1001,7 +1001,7 @@ class T4Json:
             else:
                 raise error
 
-    def __interpret_path__(self, path: str, working_level: str = None, return_as_str: bool = False) -> list | str:
+    def __interpret_path__(self, path: str, working_level: str = None, return_as_str: bool = False) -> list or str:
         """Receives a path as relative or absolute and then always returns the absolute version of the path as a list"""
         # parameter setup
         if working_level is None:
@@ -1052,7 +1052,7 @@ class T4Json:
             return self.__data__, self.__root__
 
         # functions
-        def alien_key(k: str) -> float | bool | None:
+        def alien_key(k: str) -> float or bool or None:
             try:
                 return float(k)
             except ValueError:
@@ -1068,7 +1068,7 @@ class T4Json:
         # main
         try:
             if not path_[0] == '':
-                parent_of_target_level: dict | list = self.__data__[
+                parent_of_target_level: dict or list = self.__data__[
                     self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
             else:
                 parent_of_target_level: dict = self.__data__  # level iterator... used to assign each level as it walks down the data structure.
@@ -1076,11 +1076,11 @@ class T4Json:
             for key in path_[:-1]:  # loop through path all the way down to the parent of the target level
                 if isinstance(parent_of_target_level, dict):  # if parent of the target level is a dictionary
                     try:
-                        parent_of_target_level: dict | list = parent_of_target_level[key]
+                        parent_of_target_level: dict or list = parent_of_target_level[key]
                     except KeyError:
-                        parent_of_target_level: dict | list = parent_of_target_level[alien_key(key)]
+                        parent_of_target_level: dict or list = parent_of_target_level[alien_key(key)]
                 else:  # if parent of the target level is a list
-                    parent_of_target_level: dict | list = parent_of_target_level[int(key)]
+                    parent_of_target_level: dict or list = parent_of_target_level[int(key)]
 
             target_level_key: str = path_[-1]
 
@@ -1177,7 +1177,7 @@ def is_valid_json_data(source: str) -> bool:
         return False
 
 
-def convert_to_valid_json_ready_data(value: dict | list | tuple | str | float | int | bool | None) -> dict | list | str | float | int | bool | None:
+def convert_to_valid_json_ready_data(value: dict or list or tuple or str or float or int or bool or None) -> dict or list or str or float or int or bool or None:
     """Converts *value* into JSON ready data. It will remove any unsupported keys and convert the keys that are not string into strings."""
 
     if isinstance(value, (dict, list, tuple)):
@@ -1186,11 +1186,11 @@ def convert_to_valid_json_ready_data(value: dict | list | tuple | str | float | 
         return value
 
 
-def deserialize_from_string(string: str) -> dict | list | str | int | float | bool | None:
+def deserialize_from_string(string: str) -> dict or list or str or int or float or bool or None:
     """Loads JSON data from a *string* and returns the python data structure."""
     return json.loads(string)
 
 
-def serialize_to_string(value: dict | list | str | int | float | bool | None, indent: None | int | str = None, sort_keys: bool = False, only_ascii: bool = False, separators: tuple = (', ', ': ')) -> str:
+def serialize_to_string(value: dict or list or str or int or float or bool or None, indent: None or int or str = None, sort_keys: bool = False, only_ascii: bool = False, separators: tuple = (', ', ': ')) -> str:
     """Returns a JSON formatted string from *value*. This string can then... for example be saved to a file."""
     return json.dumps(value, skipkeys=True, ensure_ascii=only_ascii, sort_keys=sort_keys, indent=indent, separators=separators)
