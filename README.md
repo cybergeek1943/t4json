@@ -58,21 +58,23 @@ Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json)
 Once you are done making changes/creating your json file... it needs to be [serialized](https://en.wikipedia.org/wiki/Serialization) / saved so that it can then be understood by other programs. For python to understand the JSON data it needs to be deserialized/loaded into a python data structure like a dictionary or list. Below are the tables used for that conversion process.
 
 __Converting/Encoding to JSON:__
-| Python | t4json | JSON |
-|--------|--------|------|
-| dict | pair container | object |
-| list/tuple | list container | array |
-| str | <--------------> | string |
-| int, float, int- & float-derived Enums | <--------------> | number
-| True | <--------------> | true |
-| False | <--------------> | false |
-| None | <--------------> | null |
+
+Python | t4json | JSON
+-|-|-
+dict | pair container | object
+list/tuple | list container | array
+str | <--------------> | string
+int, float, int- & float-derived Enums | <--------------> | number
+True | <--------------> | true
+False | <--------------> | false
+None | <--------------> | null
 
 
 
 &emsp;
 
 __Converting/Decoding from JSON to Python data structures:__
+
 JSON | t4json | Python
 -|-|-
 object | pair container | dict
