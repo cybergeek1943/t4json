@@ -322,9 +322,9 @@ class T4Json:
             if isinstance(data, list):
                 def recursive_func() -> None:
                     try:
-                        for i in range(len(data)):
-                            if isinstance(data[i], (dict, list)):
-                                if len(data[i]) == 0:
+                        for i, v in enumerate(data):
+                            if isinstance(v, (dict, list)):
+                                if len(v) == 0:
                                     self.delete(path=f'{path}{self.__path_separator__}{i}')
                     except IndexError:
                         recursive_func()
@@ -366,8 +366,7 @@ class T4Json:
 
         # parameter setup
         if chain_key and chain_key_separator == self.__path_separator__:
-            raise ArgumentError(
-                f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator__}".')
+            raise ArgumentError(f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator__}".')
         if self.is_path_relative(path):
             path: str = self.__interpret_path__(path=path, return_as_str=True)
         self.set_working_level(path='')
@@ -403,8 +402,7 @@ class T4Json:
                                         self.move_from_to(
                                             from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
                                             to_path=f'{path}{self.__path_separator__}{key}', only_contents=True,
-                                            existing_keys=existing_keys, index=list_index,
-                                            integrate_list_with_list=True)
+                                            existing_keys=existing_keys, index=list_index, integrate_list_with_list=True)
                                     recursive_func()
                                     return
                                 elif pull_pairs_from_lists and isinstance(container[key][index], dict):
@@ -414,14 +412,12 @@ class T4Json:
                                             for key_ in list(container[key][index]):
                                                 self.change_key(
                                                     path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}{self.__path_separator__}{key_}',
-                                                    new_key=f'{key}{chain_key_separator}{index}{chain_key_separator}{key_}',
-                                                    existing_key='integrate')
+                                                    new_key=f'{key}{chain_key_separator}{index}{chain_key_separator}{key_}', existing_key='integrate')
                                         else:
                                             for key_ in list(container[key][index]):
                                                 self.change_key(
                                                     path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}{self.__path_separator__}{key_}',
-                                                    new_key=f'{key}{chain_key_separator}{key_}',
-                                                    existing_key='integrate')
+                                                    new_key=f'{key}{chain_key_separator}{key_}', existing_key='integrate')
 
                                     self.move_from_to(
                                         from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
@@ -1012,9 +1008,9 @@ class T4Json:
         # parameter setup
         if working_level is None:
             working_level: str = self.__working_level__
-        if path == self.__relative_path_command__:
+        if path == '.':
             path: str = self.__working_level__
-        elif path == self.__relative_back_path_command__:
+        elif path == '..':
             path: str = self.__working_level__.rpartition(self.__path_separator__)[0]
 
         # main
