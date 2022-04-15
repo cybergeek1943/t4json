@@ -27,7 +27,7 @@ T4json is designed to simply and easily work with json data without any hassle. 
 
 ### Installation
 
-Using pip.
+Using pip:
 
 ```pip install t4json```
 
