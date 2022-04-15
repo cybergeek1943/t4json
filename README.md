@@ -1,5 +1,5 @@
 # t4json Docs
-![GitHub Workflow Status](https://raw.githubusercontent.com/dwyl/repo-badges/main/svg/build-passing.svg) ![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
+![GitHub Workflow Status](https://raw.githubusercontent.com/cybergeek1943/badges/main/build-passing.svg) ![contributions welcome](https://raw.githubusercontent.com/cybergeek1943/badges/main/contributions-welcome.svg)
 
 The t4json module was created to make working with json files in python easier. It is
 built on top of the standard json module that comes with python. It is pure python and
