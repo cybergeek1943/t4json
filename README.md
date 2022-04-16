@@ -88,7 +88,7 @@ null | <--------------> | None
 
 &emsp;
 
-### Overview of Available Global Functions
+### Overview of Global Functions
 
 
 * ```is_valid_json_data()```
