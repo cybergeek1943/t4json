@@ -37,7 +37,7 @@ Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json)
 
 ### Notes
 - All methods within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy... or you can use the copy module to make a deep copy.
-- Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data…
+- Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data.
 
 &emsp;
 
@@ -50,7 +50,7 @@ Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json)
 - An **item** is a non-container __value__.
 - A **pair container** is a dictionary.
 - A **list container** is simply a list.
-- If a path is set to an empty string ""… it is accessing the base container.
+- If a path is set to an empty string ""... it is accessing the base container.
 
 &emsp;
 
@@ -201,7 +201,7 @@ This method can be used to change the value of a key anywhere in the json data.
 
 ___path___ leads to the key which holds the value you want to change.
 
-___new_value___ is what you want to replace the old value with… It can be a __string__,  __integer__,  __float__,  __boolean__, __none__, __dictionary__, or __list__.
+___new_value___ is what you want to replace the old value with... It can be a __string__,  __integer__,  __float__,  __boolean__, __none__, __dictionary__, or __list__.
 
 
 &emsp;
@@ -210,7 +210,7 @@ This method can be used to change the name of a key anywhere in the json data.
 
 ___path___ leads to the key that you want to change.
 
-___new_key___ this is the new key… A __string__,  __integer__,  __float__,  __boolean__ or __none__ will be accepted but they of course will be converted to a __string__.
+___new_key___ this is the new key... A __string__,  __integer__,  __float__,  __boolean__ or __none__ will be accepted but they of course will be converted to a __string__.
 
 ___existing_key___ -  This parameter specifies what to do if a key already exists on the current level. 
 If set to "__pass__" then the key that already exists on the current level it will be ignored and nothing will change. 
@@ -332,7 +332,7 @@ ___path___ Leads to the key that will have its value be returned.
 
 &emsp;
 ###### _T4Json._ ```json_string(path='', indent=None, sort_keys=None, only_ascii=None, separators=None)```
-Returns a json formatted string. This string can then… for example be saved to a file.
+Returns a json formatted string. This string can then... for example be saved to a file.
 
 ___path___ Leads to the key that will have its value be returned as a json formatted string.
 
