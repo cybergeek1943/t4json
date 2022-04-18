@@ -31,13 +31,13 @@ Using pip:
 
 ```pip install t4json```
 
-Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json) and use as a local module within your project... which may be more useful if you want to make changes to it.
+Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json) and use as a local module within your project… which may be more useful if you want to make changes to it.
 
 &emsp;
 
 ### Notes
-- All methods within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy... or you can use the copy module to make a deep copy.
-- Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data.
+- All methods within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy… or you can use the copy module to make a deep copy.
+- Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data…
 
 &emsp;
 
@@ -50,12 +50,12 @@ Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json)
 - An **item** is a non-container __value__.
 - A **pair container** is a dictionary.
 - A **list container** is simply a list.
-- If a path is set to an empty string ""... it is accessing the base container.
+- If a path is set to an empty string ""… it is accessing the base container.
 
 &emsp;
 
 ### JSON Conversion Table
-Once you are done making changes/creating your json file... it needs to be [serialized](https://en.wikipedia.org/wiki/Serialization) / saved so that it can then be understood by other programs. For python to understand the JSON data it needs to be deserialized/loaded into a python data structure like a dictionary or list. Below are the tables used for that conversion process.
+Once you are done making changes/creating your json file… it needs to be [serialized](https://en.wikipedia.org/wiki/Serialization) / saved so that it can then be understood by other programs. For python to understand the JSON data it needs to be deserialized/loaded into a python data structure like a dictionary or list. Below are the tables used for that conversion process.
 
 __Converting/Encoding to JSON:__
 
@@ -186,11 +186,11 @@ ___existing_keys___ -  This parameter specifies what to do with keys that alread
 If set to "__pass__" then any key/s that already exists on the current level will be ignored. 
 If set to "__replace__" then any key/s that already exist on the current level will have its value be replaced by the value of the new key/s. 
 If set to "__combine__" then any key/s that already exist on the current level will have its value be combined with the value of the new key/s in a list.
-If set to "__integrate__" then any key/s that already exist on the current level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers... they will be integrated into ___one___ container.
+If set to "__integrate__" then any key/s that already exist on the current level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers… they will be integrated into ___one___ container.
 
 ___create___ when set to ```True``` a list will be created if ```path``` leads to a non-container item. This list will include the non-container item along with the new ```value```. Otherwise, if it is ```False``` it will raise an __```AddError```__.
 
-___index___ when ```path``` leads to a __list__ and this argument is passed and integer... ```value``` will be inserted at the specified index. A string can also be passed to indicate where to place ```value```. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)... or it can be a positive integer in a string that represents a proportional percentage/scale of where to place ```value```... with "0" being at the start and "100" being the end. When ```None``` is passed, ```value``` will be placed at the end of the list.
+___index___ when ```path``` leads to a __list__ and this argument is passed and integer… ```value``` will be inserted at the specified index. A string can also be passed to indicate where to place ```value```. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)… or it can be a positive integer in a string that represents a proportional percentage/scale of where to place ```value```… with "0" being at the start and "100" being the end. When ```None``` is passed, ```value``` will be placed at the end of the list.
 
 ___integrate_list_with_list___ - If  ```path``` leads to a list and ```value``` is a list then both lists will be integrated into one list.
 
@@ -201,7 +201,7 @@ This method can be used to change the value of a key anywhere in the json data.
 
 ___path___ leads to the key which holds the value you want to change.
 
-___new_value___ is what you want to replace the old value with... It can be a __string__,  __integer__,  __float__,  __boolean__, __none__, __dictionary__, or __list__.
+___new_value___ is what you want to replace the old value with… It can be a __string__,  __integer__,  __float__,  __boolean__, __none__, __dictionary__, or __list__.
 
 
 &emsp;
@@ -210,13 +210,13 @@ This method can be used to change the name of a key anywhere in the json data.
 
 ___path___ leads to the key that you want to change.
 
-___new_key___ this is the new key... A __string__,  __integer__,  __float__,  __boolean__ or __none__ will be accepted but they of course will be converted to a __string__.
+___new_key___ this is the new key… A __string__,  __integer__,  __float__,  __boolean__ or __none__ will be accepted but they of course will be converted to a __string__.
 
 ___existing_key___ -  This parameter specifies what to do if a key already exists on the current level. 
 If set to "__pass__" then the key that already exists on the current level it will be ignored and nothing will change. 
 If set to "__replace__" then the key that already exist on the current level will have its value be replaced by the value of the old key being changed. 
 If set to "__combine__" then the key that already exist on the current level will have its value be combined with the value of the old key in a list.
-If set to "__integrate__" then the key that already exist on the current level will have its value be integrated as best as possible with the value of the old key. If both the existing and old keys have values that are containers... they will be integrated into ___one___ container.
+If set to "__integrate__" then the key that already exist on the current level will have its value be integrated as best as possible with the value of the old key. If both the existing and old keys have values that are containers… they will be integrated into ___one___ container.
 If set to "__error__" an ```ArgumentError``` will be raised if a key already exists on the current level.
 
 
@@ -234,11 +234,11 @@ ___existing_keys___ -  This parameter specifies what to do with keys that alread
 If set to "__pass__" then any key/s that already exists on the target level will be ignored.
 If set to "__replace__" then any key/s that already exist on the target level will have its value be replaced by the value of the new key/s. 
 If set to "__combine__" then any key/s that already exist on the target level will have its value be combined with the value of the new key/s in a list.
-If set to "__integrate__" then any key/s that already exist on the target level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers... they will be integrated into ___one___ container.
+If set to "__integrate__" then any key/s that already exist on the target level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers… they will be integrated into ___one___ container.
 
 ___create___ when set to ```True``` a list will be created if ```path``` leads to a non-container item. This list will include the non-container item along with the moved ```value```. Otherwise, if it is ```False``` it will raise an __```AddError```__.
 
-___index___ when ```to_path``` leads to a __list__ and this argument is passed and integer... the _value_ from ```from_path``` will be inserted at the specified index. A string can also be passed to indicate where to place the _value_. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)... or it can be a positive integer in a string that represents a proportional percentage/scale of where to place the _value_... with "0" being at the start and "100" being the end. When ```None``` is passed, the _value_ will be placed at the end of the list.
+___index___ when ```to_path``` leads to a __list__ and this argument is passed and integer… the _value_ from ```from_path``` will be inserted at the specified index. A string can also be passed to indicate where to place the _value_. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)… or it can be a positive integer in a string that represents a proportional percentage/scale of where to place the _value_… with "0" being at the start and "100" being the end. When ```None``` is passed, the _value_ will be placed at the end of the list.
 
 ___integrate_list_with_list___ - If  ```to_path``` leads to a list and the _value_ from ```from_path``` is a list then both lists will be integrated into one list.
 
@@ -303,17 +303,17 @@ __chain_key_separator__ - This is used as the separator between the keys as they
 
 ___flatten_opposite_container_type___ when set to ```True``` the opposite container type of the target one being flattened will also be flattened. For example: If you are flattening a pair container then all the list containers inside the pair container will also be flattened. Or if you are flattening a list container then all the pair containers within that list container will be flattened.
 
-__pull_pairs_from_lists__ - If flatting a pair container... then any pair/s contained in lists will be pulled out and flattened. This will only work if ```flatten_opposite_container_type``` has been set to ```True```.
+__pull_pairs_from_lists__ - If flatting a pair container… then any pair/s contained in lists will be pulled out and flattened. This will only work if ```flatten_opposite_container_type``` has been set to ```True```.
 
-__pull_list_from_pairs__ - If flatting a list container... then any pair/s within that data that contain lists as values will be pulled out and flattened. This will only work if ```flatten_opposite_container_type``` has been set to ```True```.
+__pull_list_from_pairs__ - If flatting a list container… then any pair/s within that data that contain lists as values will be pulled out and flattened. This will only work if ```flatten_opposite_container_type``` has been set to ```True```.
 
 ___existing_keys___ -  This parameter specifies what to do with keys that already exist on the base level. 
 If set to "__pass__" then any key/s that already exists on the base level will be ignored.
 If set to "__replace__" then any key/s that already exist on the base level will have its value be replaced by the value of the new key/s. 
 If set to "__combine__" then any key/s that already exist on the base level will have its value be combined with the value of the new key/s in a list.
-If set to "__integrate__" then any key/s that already exist on the base level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers... they will be integrated into ___one___ container.
+If set to "__integrate__" then any key/s that already exist on the base level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers… they will be integrated into ___one___ container.
 
-___list_index___ when a _list_ is being flattened any nested contents will be pulled to the specified index. A string can also be passed to indicate where to place the _value_. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)... or it can be a positive integer in a string that represents a proportional percentage/scale of where to place the _value_... with "0" being at the start and "100" being the end. When ```None``` is passed, the _value_ will be placed at the end of the list. If a nested _list_ is being flattened, and you want the contents to keep their positions than pass "hold".
+___list_index___ when a _list_ is being flattened any nested contents will be pulled to the specified index. A string can also be passed to indicate where to place the _value_. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)… or it can be a positive integer in a string that represents a proportional percentage/scale of where to place the _value_… with "0" being at the start and "100" being the end. When ```None``` is passed, the _value_ will be placed at the end of the list. If a nested _list_ is being flattened, and you want the contents to keep their positions than pass "hold".
 
 ___delete_empty_containers___ - Once the flatting is all done and dusted and if this is set to ```True``` then any keys with empty containers as values will be deleted.
 
@@ -332,7 +332,7 @@ ___path___ Leads to the key that will have its value be returned.
 
 &emsp;
 ###### _T4Json._ ```json_string(path='', indent=None, sort_keys=None, only_ascii=None, separators=None)```
-Returns a json formatted string. This string can then... for example be saved to a file.
+Returns a json formatted string. This string can then… for example be saved to a file.
 
 ___path___ Leads to the key that will have its value be returned as a json formatted string.
 
@@ -515,7 +515,7 @@ Returns the path separator properties in a tuple - (path separator, relative com
 
 &emsp;
 ###### _T4Json._ ```reset_settings()```
-Resets any settings that have been changed... back to their original default values.
+Resets any settings that have been changed… back to their original default values.
 
 
 &emsp;
@@ -623,12 +623,12 @@ ___
 
 #### Other/Misc Methods:
 ###### _T4Json._ ```is_path_existent(path)```
-Checks to see if ___path___ exist in the currently opened data structure. ```True``` is return if it does exist... and ```False``` otherwise.
+Checks to see if ___path___ exist in the currently opened data structure. ```True``` is return if it does exist… and ```False``` otherwise.
 
 
 &emsp;
 ###### _T4Json._ ```is_path_relative(path)```
-Checks to see if ___path___ is a relative path. ```True``` is returned if it is... and ```False``` otherwise.
+Checks to see if ___path___ is a relative path. ```True``` is returned if it is… and ```False``` otherwise.
 
 
 &emsp;
@@ -707,7 +707,7 @@ If you want to start with a clean slate and create json data from scratch then:
 data = T4Json()
 # start adding items here
 ```
-By default, when creating new json data, the initial data is just an empty dictionary. If you want to specify the starting data to work with... pass it to the ```new()``` method:
+By default, when creating new json data, the initial data is just an empty dictionary. If you want to specify the starting data to work with… pass it to the ```new()``` method:
 ```python
 fresh_start = {'version': 1.0}
 data = T4Json()
