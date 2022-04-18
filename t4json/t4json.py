@@ -338,7 +338,6 @@ class T4Json:
 
         self.__data__[self.__root__] = new
         self.set_working_level('')
-        self.__file_path__: str or None = None
 
     def wipe(self) -> None:
         """Removes all data and leaves you with an empty dict."""
@@ -904,7 +903,7 @@ class T4Json:
                 data: dict or list = json.load(file)
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
-            self.__file_path__: str or None = None
+            self.__file_path__: str = file_path
         except FileNotFoundError:
             if create:
                 with open(file_path, 'w', encoding=encoding, errors=encoding_errors) as new_file:
@@ -1148,7 +1147,7 @@ class PathError(Exception):
                              '\n\t3. Keys within the json file may contain the same characters used as the path '
                              'separator properties... if that is the case change the path separator properties using '
                              '<self.set_path_separator_properties()>.\n\t4. The path separator properties may have '
-                             'been typed incorrectly or changed.')
+                             'been typed incorrectly or changed.\n\t5. There may be a key being used that is not supported.')
 
 
 class AddError(Exception):
