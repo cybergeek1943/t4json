@@ -118,8 +118,8 @@ class T4Json:
                              integrate_list_with_list=integrate_list_with_list, ignore_errors=ignore_errors)
             else:
                 self.__raise_error__(AddError, ignore_errors)
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def change_value(self, path: str, new_value: dict or list or str or float or int or bool or None,
                      ignore_errors: bool = None) -> None:
@@ -141,8 +141,8 @@ class T4Json:
                     self.set_working_level(self.__path_separator__.join(path.split(self.__path_separator__)[:-1]))
                 else:
                     self.set_working_level(path='')
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def change_key(self, path: str, new_key: str or int or float or bool or None, existing_key: str = 'error',
                    ignore_errors: bool = None) -> None:
@@ -152,7 +152,7 @@ class T4Json:
         if ignore_errors is None:
             ignore_errors: bool = self.ignore_method_errors
         if path == '':
-            self.__raise_error__(error=PathError, ignore=ignore_errors)
+            self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
             return
         new_key: str = str(new_key)
         path: str = self.__interpret_path__(path, return_as_str=True)  # in-case <path> is relative
@@ -212,8 +212,8 @@ class T4Json:
             self.__raise_error__(
                 IndexError('The path you entered leads to a list... Use a path that leads to a json object/dict pair.'),
                 ignore_errors)
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def move_from_to(self, from_path: str, to_path: str, only_contents: bool = False, existing_keys: str = 'combine',
                      create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False,
@@ -242,8 +242,8 @@ class T4Json:
 
             else:
                 self.__raise_error__(error=ArgumentError('Cannot move the current level - <from_path> - further into itself.'), ignore=ignore_errors)
-        except PathError:
-            self.__raise_error__(error=PathError, ignore=ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
 
     def copy_from_to(self, from_path: str, to_path: str, only_contents: bool = False, existing_keys: str = 'combine',
                      create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False,
@@ -271,8 +271,8 @@ class T4Json:
                                  integrate_list_with_list=integrate_list_with_list)
             else:
                 self.__raise_error__(error=ArgumentError('Cannot copy the current level - <from_path> - further into itself.'), ignore=ignore_errors)
-        except PathError:
-            self.__raise_error__(error=PathError, ignore=ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
 
     def delete(self, path: str, ignore_errors: bool = None) -> tuple or None:
         """Deletes the pair or item wherever *path* leads."""
@@ -284,7 +284,7 @@ class T4Json:
         if self.is_path_relative(path):
             path: str = self.__interpret_path__(path=path, return_as_str=True)  # in-case <path> is relative
         if path == '':
-            self.__raise_error__(PathError, ignore_errors)
+            self.__raise_error__(KeyPathError, ignore_errors)
             return
 
         # main
@@ -299,8 +299,8 @@ class T4Json:
                     self.set_working_level(path='')
 
             return out, data[1]
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def delete_empty_containers(self, path: str = '', ignore_errors: bool = None) -> None:
         """Deletes any keys with empty containers as values. *path* can be used to select the level where this will take place"""
@@ -330,8 +330,8 @@ class T4Json:
                         recursive_func()
                 recursive_func()
 
-        except PathError:
-            self.__raise_error__(error=PathError, ignore=ignore_errors, from_none=True)
+        except KeyPathError:
+            self.__raise_error__(error=KeyPathError, ignore=ignore_errors, from_none=True)
 
     def overwrite(self, new: dict or str or list or tuple or int or float or bool or None) -> None:
         """Overwrites/replaces all the current data with *new*"""
@@ -468,8 +468,8 @@ class T4Json:
 
             if delete_empty_containers:
                 self.delete_empty_containers()
-        except PathError:
-            self.__raise_error__(error=PathError, ignore=ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
 
     def read(self, path: str = '', ignore_errors: bool = None) -> dict or str or list or int or float or bool or None:
         """Returns the value of wherever *path* leads."""
@@ -482,8 +482,8 @@ class T4Json:
         try:
             data: tuple = self.__walk_path__(path=path)
             return data[0][data[1]]
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def pair(self, path: str, as_dictionary: bool = False, ignore_errors: bool = None) -> tuple or dict:
         """Returns a pair in the form of a tuple (<key>, <value>) or dictionary pair {<key>: <value>}
@@ -500,8 +500,8 @@ class T4Json:
                 return {data[1]: data[0][data[1]]}
             else:
                 return data[1], data[0][data[1]]
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def pairs(self, path: str = '', as_dictionaries: bool = False, ignore_errors: bool = None) -> list:
         """Returns a list of tuples of (key, value) pairs - [(key, value), (key, value)..] of the selected level.
@@ -520,8 +520,8 @@ class T4Json:
                     return [{k: v} for k, v in data.items()]
                 else:
                     return list(data.items())
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def key(self, path: str, ignore_errors: bool = None) -> str or int or float or bool or None:
         """Returns the key of the value that *path* leads to. If the value is in a list the values index will be
@@ -534,8 +534,8 @@ class T4Json:
         # main
         try:
             return self.__walk_path__(path=path)[1]
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def keys(self, path: str = '', ignore_errors: bool = None) -> list:
         """Returns a list of all the of keys in the location that is specified by *path*. If *path* leads
@@ -552,8 +552,8 @@ class T4Json:
                 return list(data[0][data[1]])
             elif isinstance(data[0][data[1]], list):
                 return [i for d in data[0][data[1]] if isinstance(d, dict) for i in d]
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def values(self, path: str = '', only_values_of_pairs: bool = True,
                ignore_errors: bool = None) -> list:
@@ -575,8 +575,8 @@ class T4Json:
                     return [i for d in data if isinstance(d, dict) for i in d.values()]
                 else:
                     return [d for d in data if not isinstance(d, dict)] + [i for d in data if isinstance(d, dict) for i in d.values()]
-        except PathError:
-            self.__raise_error__(PathError, ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(KeyPathError, ignore_errors)
 
     def all_keys(self, path: str = '', search_lists: bool = True, as_paths: bool = False, ignore_errors: bool = None) -> list:
         """Returns a list of all the keys past a certain point which is specified by *path*. This method only returns0
@@ -617,7 +617,7 @@ class T4Json:
 
             return list(data.__data__[data.__root__])
 
-        except (PathError, AddError):
+        except (KeyPathError, AddError):
             data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
                                  ignore_errors)
         except AttributeError:
@@ -648,7 +648,7 @@ class T4Json:
 
             return list(data.__data__[data.__root__].values())
 
-        except (PathError, AddError):
+        except (KeyPathError, AddError):
             data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
                                  ignore_errors)
         except AttributeError:
@@ -679,7 +679,7 @@ class T4Json:
 
             return data.pairs(as_dictionaries=as_dictionaries)
 
-        except (PathError, AddError):
+        except (KeyPathError, AddError):
             data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
                                  ignore_errors)
         except AttributeError:
@@ -716,7 +716,7 @@ class T4Json:
 
             return data.read(path=key)
 
-        except (PathError, AddError, AttributeError):
+        except (KeyPathError, AddError, AttributeError):
             data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
                                  ignore_errors)
         except AttributeError:
@@ -755,8 +755,8 @@ class T4Json:
                 self.__working_level__: str = path
             else:
                 self.__working_level__: str = self.__path_separator__.join(path.split(self.__path_separator__)[:-1])
-        except PathError:
-            self.__raise_error__(error=PathError, ignore=ignore_errors)
+        except KeyPathError:
+            self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
 
     def set_indentation(self, indentation: int or str or None) -> None:
         """Sets the indentation of the JSON file which will be applied when it is saved/serialized."""
@@ -865,7 +865,7 @@ class T4Json:
         try:
             self.__walk_path__(path)
             return True
-        except PathError:
+        except KeyPathError:
             return False
 
     def is_path_relative(self, path: str = '') -> bool:
@@ -1040,7 +1040,7 @@ class T4Json:
             else:
                 return out
         except AttributeError:
-            raise PathError
+            raise KeyPathError
 
     def __walk_path__(self, path: str) -> tuple:
         """return the parent container along with the key in a tuple to access its value - (container, key)."""
@@ -1111,11 +1111,11 @@ class T4Json:
                 catch_invalid_path(int(target_level_key))  # since the target level is not checked in the for loop check it here
                 return parent_of_target_level, int(target_level_key)
         except (KeyError, ValueError, TypeError, IndexError):
-            raise PathError
+            raise KeyPathError
 
 
 class LoadError(Exception):
-    def __init__(self, message: str = None):
+    def __init__(self, message: str = None) -> None:
         if message is None:
             super().__init__('Json data could not be loaded.\nSome things that may have gone wrong:'
                              '\n\t1. A file was attempting to be loaded that does not exist. - Set the '
@@ -1138,8 +1138,8 @@ class LoadStringError(Exception):
     pass
 
 
-class PathError(Exception):
-    def __init__(self, message: str = None):
+class KeyPathError(Exception):
+    def __init__(self, message: str = None) -> None:
         if message is None:
             super().__init__('\n<path> is an invalid structure path.\nSome things that may have gone wrong:'
                              '\n\t1. The path may lead to a list... Integer characters must be used as an index to '
@@ -1151,7 +1151,7 @@ class PathError(Exception):
 
 
 class AddError(Exception):
-    def __init__(self, message: str = None):
+    def __init__(self, message: str = None) -> None:
         if message is None:
             super().__init__('(<value> cannot be added because <structure_path> leads to a mutable object.)'
                              ' - OR - (A non-json object/pair was attempting to be add to a json container.)'
