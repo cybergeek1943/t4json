@@ -1,9 +1,9 @@
 # t4json Docs
 ![GitHub Workflow Status](https://raw.githubusercontent.com/cybergeek1943/badges/main/build-passing.svg) ![contributions welcome](https://raw.githubusercontent.com/cybergeek1943/badges/main/contributions-welcome.svg)
 
-The t4json module was created to make working with [JSON](https://www.json.org/json-en.html) data in python easier. It provides a bunch of tools to seamlessly open, edit and save JSON data. The JSON data is first [deserialized](https://en.wikipedia.org/wiki/Serialization) and stored in an attribute of the T4Json class... this way you can work with the deserialized data directly if you want. The tools
+The t4json module was created to make working with [JSON](https://www.json.org/json-en.html) data in python easier. It provides a bunch of tools to seamlessly open, edit and save JSON data. The JSON data is first [deserialized](https://en.wikipedia.org/wiki/Serialization) and stored in an attribute of the T4Json class... this way you can work with the deserialized data directly just as you would with the slandered json module. The tools provided by t4json have tons of features so that you can do really specific things... if you only want to read a few values from some simple json data you might as well use the standard json module.
 
-It should work on any installation of python 3.6
+This module should work on any installation of python 3.6
 or later on any OS right out of the box. Its only third party dependency is the "requests" package.
 
 __Outline:__
