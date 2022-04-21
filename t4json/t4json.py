@@ -1,5 +1,19 @@
 import json
 
+# TODO maybe if new data has current valid working path than do not reset current working path
+# TODO make path tools to work with the paths in t4json class easier
+# TODO make sure all expected values from methods are exact and accurate
+# TODO test all methods where applicable with relative structure paths
+# TODO adding values that are dicts make sure that the keys are strings for later editing/reading
+# TODO test all methods
+# TODO make sure that all method watch out for current working level and incase they interfere with it
+# ----------------------------------------------------------------------------------------------------------------------
+# TODO analyze method names
+# TODO analyze variable names
+# TODO analyze comments
+# TODO analyze pydocs
+# TODO analyze official docs
+
 
 class T4Json:
 
@@ -56,6 +70,7 @@ class T4Json:
                         else:
                             data.update({k: v})
                     for k in duplicates:
+                        # self.change_value(f'{path}{self.__path_separator__}{k}', [self.read(path=f'{path}{self.__path_separator__}{k}'), duplicates[k]])
                         self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}',
                                  existing_keys=existing_keys, create=True, index=index, integrate_list_with_list=False)
                 elif existing_keys == 'integrate':
@@ -66,6 +81,11 @@ class T4Json:
                         else:
                             data.update({k: v})
                     for k in duplicates:
+                        # # incase a list that has the same key is being added to a container where the existing key holds a non-container value like str.
+                        # existing_duplicate_path: str = f'{path}{self.__path_separator__}{k}'
+                        # existing_duplicate_value: dict or list or str or float or int or bool or None = self.read(existing_duplicate_path)
+                        # if not isinstance(existing_duplicate_value, (list, dict)):
+                        #     self.change_value(existing_duplicate_value, [existing_duplicate_value])
                         self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}', existing_keys=existing_keys,
                                  create=True, index=index, integrate_list_with_list=True, ignore_errors=ignore_errors)
                 else:
@@ -930,9 +950,9 @@ class T4Json:
 
     def load_from_url(self, url: str, encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
         """Loads JSON data from the specified URL."""
-        from urllib.request import urlopen
+        from requests import get as geturl
         try:
-            data: dict or list = json.loads(urlopen(url).read().decode(encoding=encoding, errors=encoding_errors))
+            data: dict or list = json.loads(geturl(url=url).content.decode(encoding=encoding, errors=encoding_errors))
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
             self.__file_path__: str or None = None
