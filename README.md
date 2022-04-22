@@ -524,7 +524,7 @@ Resets any settings that have been changed… back to their original default val
 ___
 
 #### I/O Methods:
-__Note__ - ( A few parameters have been left out in the documentation below. The first is ```encoding``` and ```encoding_errors```/```errors```. These parameters are part of the built-in open() function. Check out the open() functions [docs](https://docs.python.org/3/library/functions.html#open) for more information.
+__Note__ - ( A few parameters have been left out in the documentation below. The first is ```encoding``` and ```encoding_errors```/```errors```. These parameters are part of the built-in open() function. Check out the open() functions [docs](https://docs.python.org/3/library/functions.html#open) for more information. In addition ```decode_html_entities``` has also been left out. ```decode_html_entities``` just decodes any HTML [entities](https://www.freeformatter.com/html-entities.html)... by default it is set to ```False```.
 
 The second pair of parameters are ```api_parameters```/```params``` and ```api_authentication```/```auth```. They are used to interact with APIs from a URL/endpoint. There functionality comes from the "requests" package. If you are not familiar with the [request](https://docs.python-requests.org/en/latest/) package you may want to look into it before using these features. Check out the docs for the parameters ```params``` [here](https://docs.python-requests.org/en/latest/api/#requests.get) & [here](https://pythonexamples.org/python-requests-send-parameters-in-url/) ___and___ ```auth``` [here](https://docs.python-requests.org/en/latest/user/authentication).)
 
