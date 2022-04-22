@@ -524,9 +524,18 @@ Resets any settings that have been changed… back to their original default val
 ___
 
 #### I/O Methods:
-Note - Two parameters have been left out in the documentation below. They are ```encoding``` and ```encoding_errors```/```errors```. These parameters are part of the built-in open() function. Check out the open() functions [docs](https://docs.python.org/3/library/functions.html#open) for more information.
+__Note__ - ( A few parameters have been left out in the documentation below. The first is ```encoding``` and ```encoding_errors```/```errors```. These parameters are part of the built-in open() function. Check out the open() functions [docs](https://docs.python.org/3/library/functions.html#open) for more information.
+
+The second pair of parameters are ```api_parameters```/```params``` and ```api_authentication```/```auth```. They are used to interact with APIs from a URL/endpoint. There functionality comes from the "requests" package. If you are not familiar with the [request](https://docs.python-requests.org/en/latest/) package you may want to look into it before using these features. Check out the docs for the parameters ```params``` [here](https://docs.python-requests.org/en/latest/api/#requests.get) & [here](https://pythonexamples.org/python-requests-send-parameters-in-url/) ___and___ ```auth``` [here](https://docs.python-requests.org/en/latest/user/authentication).)
 
 &emsp;
+
+__Note__ - ( The ```__init__()``` for the T4Json class uses the same parameters as the ```load()``` method because it calls ```load()```. If you decide to not pass any data when initiating the T4Json class then you can call ```load()``` and it will do the same thing. )
+
+&emsp;
+
+&emsp;
+
 ###### _T4Json._ ```load(source, create=False)```
 This method loads the json data. It can receive a *File Path*, *URL*, or *JSON String*.
 
@@ -864,10 +873,12 @@ Look at the original json data from the [URL](https://mdn.github.io/learning-are
 &emsp;
 
 ___
+
 ## Dependencies
 The only third party dependency is the "request" module.
 
 ___
+
 ## License
 
 __MIT__
