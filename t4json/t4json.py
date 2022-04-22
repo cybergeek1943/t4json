@@ -10,7 +10,7 @@ class T4Json:
         '__working_level__', '__root__', '__data__')
 
     def __init__(self, source: str = None, create: bool = False, api_parameters: dict or list or bytes = None,
-                 api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
+                 api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False):
         self.__file_path__: str or None = None  # used throughout the class to open, write and read to JSON files
 
         # user_settings
@@ -31,7 +31,8 @@ class T4Json:
 
         if source is not None:
             self.load(source=source, create=create, api_parameters=api_parameters,
-                      api_authentication=api_authentication, encoding=encoding, encoding_errors=encoding_errors)
+                      api_authentication=api_authentication, encoding=encoding, encoding_errors=encoding_errors,
+                      decode_html_entities=decode_html_entities)
 
     def add(self, value: dict or list or str or float or int or bool or None, path: str = '', existing_keys: str = 'pass', create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False, ignore_errors: bool = None) -> None:
         """Adds *value* to the base... or elsewhere if specified by *path*."""
@@ -213,7 +214,7 @@ class T4Json:
 
         except (IndexError, TypeError):
             self.__raise_error__(
-                IndexError('The path you entered leads to a list... Use a path that leads to a json object/dict pair.'),
+                IndexError('The path you entered leads to a list... Use a path that leads to a JSON object/dict pair.'),
                 ignore_errors)
         except KeyPathError:
             self.__raise_error__(KeyPathError, ignore_errors)
@@ -621,7 +622,7 @@ class T4Json:
             return list(data.__data__[data.__root__])
 
         except (KeyPathError, AddError):
-            data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
+            data.__raise_error__(ValueError('there was a problem while searching through the JSON data.'),
                                  ignore_errors)
         except AttributeError:
             pass
@@ -652,7 +653,7 @@ class T4Json:
             return list(data.__data__[data.__root__].values())
 
         except (KeyPathError, AddError):
-            data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
+            data.__raise_error__(ValueError('there was a problem while searching through the JSON data.'),
                                  ignore_errors)
         except AttributeError:
             pass
@@ -683,7 +684,7 @@ class T4Json:
             return data.pairs(as_dictionaries=as_dictionaries)
 
         except (KeyPathError, AddError):
-            data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
+            data.__raise_error__(ValueError('there was a problem while searching through the JSON data.'),
                                  ignore_errors)
         except AttributeError:
             pass
@@ -720,7 +721,7 @@ class T4Json:
             return data.read(path=key)
 
         except (KeyPathError, AddError, AttributeError):
-            data.__raise_error__(ValueError('there was a problem while searching through the json data.'),
+            data.__raise_error__(ValueError('there was a problem while searching through the JSON data.'),
                                  ignore_errors)
         except AttributeError:
             pass
@@ -884,27 +885,33 @@ class T4Json:
             else:
                 return False
 
-    def load(self, source: str, create: bool = False, api_parameters: dict or list or bytes = None, api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
+    def load(self, source: str, create: bool = False, api_parameters: dict or list or bytes = None, api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
         """This method loads the JSON data. It can receive a File Path, URL, or JSON String."""
 
         try:
-            self.load_from_string(string=source)
-        except LoadStringError:
+            self.load_file(file_path=source, create=create, encoding=encoding, encoding_errors=encoding_errors,
+                           decode_html_entities=decode_html_entities)
+        except LoadFileError:
             try:
-                self.load_from_url(url=source, api_parameters=api_parameters, api_authentication=api_authentication,
-                                   encoding=encoding, encoding_errors=encoding_errors)
-            except LoadURLError:
+                self.load_from_string(string=source, encoding=encoding, encoding_errors=encoding_errors,
+                                      decode_html_entities=decode_html_entities)
+            except LoadStringError:
                 try:
-                    self.load_file(file_path=source, create=create, encoding=encoding, encoding_errors=encoding_errors)
-                except LoadFileError:
+                    self.load_from_url(url=source, api_parameters=api_parameters, api_authentication=api_authentication,
+                                       encoding=encoding, encoding_errors=encoding_errors,
+                                       decode_html_entities=decode_html_entities)
+                except LoadURLError:
                     raise LoadError
 
-    def load_file(self, file_path: str, create: bool = False, encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
+    def load_file(self, file_path: str, create: bool = False, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
         """Loads the JSON data from a specified file."""
 
         try:
             with open(file_path, 'r', encoding=encoding, errors=encoding_errors) as file:
-                data: dict or list = json.load(file)
+                if decode_html_entities:
+                    self.load_from_string(string=file.read(), decode_html_entities=decode_html_entities)
+                else:
+                    data: dict or list = json.load(file)
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
             self.__file_path__: str = file_path
@@ -919,30 +926,38 @@ class T4Json:
                     'be created.')
         except BaseException:
             raise LoadFileError(
-                'There was an error retrieving the json data from file. It may be corrupted.')
+                'There was an error retrieving the JSON data from file. It may be corrupted or <encoding> could be incorrect.')
 
-    def load_from_string(self, string: str) -> None:
+    def load_from_string(self, string: str or bytes, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
         """Loads JSON data from a string."""
+
         try:
-            data: dict or list = json.loads(string)
+            if isinstance(string, bytes):
+                string: str = string.decode(encoding=encoding, errors=encoding_errors)
+            if decode_html_entities:
+                data: dict or list = json.loads(self.__decode_html_entities(string))
+            else:
+                data: dict or list = json.loads(string)
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
             self.__file_path__: str or None = None
         except BaseException:
-            raise LoadStringError(
-                '<string> is invalid json data.')
+            raise LoadStringError('<string> is invalid JSON data.')
 
-    def load_from_url(self, url: str, api_parameters: dict or list or bytes = None, api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
+    def load_from_url(self, url: str, api_parameters: dict or list or bytes = None, api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
         """Loads JSON data from the specified URL."""
         from requests import get as geturl
+
         try:
-            data: dict or list = json.loads(geturl(url=url, params=api_parameters, auth=api_authentication).content.decode(encoding=encoding, errors=encoding_errors))
+            if decode_html_entities:
+                data: dict or list = json.loads(self.__decode_html_entities(geturl(url=url, params=api_parameters, auth=api_authentication).content.decode(encoding=encoding, errors=encoding_errors)))
+            else:
+                data: dict or list = json.loads(geturl(url=url, params=api_parameters, auth=api_authentication).content.decode(encoding=encoding, errors=encoding_errors))
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
             self.__file_path__: str or None = None
         except BaseException:
-            raise LoadURLError(
-                'json data could not be retrieved from <url>.')
+            raise LoadURLError
 
     def save(self, indent: int or str = None, sort_keys: bool = None, only_ascii: bool = None, separators: tuple = None,
              encoding: str = 'utf-8', encoding_errors: str = 'strict') -> None:
@@ -1005,6 +1020,11 @@ class T4Json:
                 raise error from None
             else:
                 raise error
+
+    @staticmethod
+    def __decode_html_entities(string: str) -> str:
+        from html import unescape as decode_html
+        return decode_html(string.replace('&quot;', r'\"'))
 
     def __interpret_path__(self, path: str, working_level: str = None, return_as_str: bool = False) -> list or str:
         """Receives a path as relative or absolute and then always returns the absolute version of the path as a list"""
@@ -1121,25 +1141,45 @@ class T4Json:
 class LoadError(Exception):
     def __init__(self, message: str = None) -> None:
         if message is None:
-            super().__init__('Json data could not be loaded.\nSome things that may have gone wrong:'
+            super().__init__('JSON data could not be loaded.\nSome things that may have gone wrong:'
                              '\n\t1. A file was attempting to be loaded that does not exist. - Set the '
                              '<create> argument to True so that if a file does not exist it will be '
-                             'created.\n\t2. If json data was attempting to be read from a URL - access '
+                             'created.\n\t2. If JSON data was attempting to be read from a URL - access '
                              'was denied, URL does not exist or there are connection issues.'
-                             '\n\t3. A string was attempting to be loaded but failed because of incorrect json '
-                             'data format.\n\t4. Json data could be corrupted.')
+                             '\n\t3. A string was attempting to be loaded but failed because of incorrect JSON '
+                             'data format.\n\t4. JSON data could be corrupted.\n\t5. There could be encoding issues '
+                             'that are corrupting the data.')
 
 
 class LoadFileError(Exception):
-    pass
+    def __init__(self, message: str = None) -> None:
+        if message is None:
+            super().__init__('JSON data could not be loaded.\nSome things that may have gone wrong:'
+                             '\n\t1. A file was attempting to be loaded that does not exist. - Set the '
+                             '<create> argument to True so that if a file does not exist it will be '
+                             'created.\n\t2. If JSON data was attempting to be read from a URL - access '
+                             'was denied, URL does not exist or there are connection issues.'
+                             '\n\t3. JSON data could be corrupted.\n\t4. There could be encoding issues '
+                             'that are corrupting the data.')
 
 
 class LoadURLError(Exception):
-    pass
+    def __init__(self, message: str = None) -> None:
+        if message is None:
+            super().__init__('JSON data could not be retrieved from <url>.'
+                             '\nSome things that may have gone wrong:'
+                             '\n\t1. Access was denied, URL does not exist or there are connection issues.'
+                             '\n\t2. JSON data could be corrupted.'
+                             '\n\t3. There could be encoding issues that are corrupting the data.')
 
 
 class LoadStringError(Exception):
-    pass
+    def __init__(self, message: str = None) -> None:
+        if message is None:
+            super().__init__('JSON data could not be loaded.'
+                             '\nSome things that may have gone wrong:'
+                             '\n\t1. JSON data is corrupted.'
+                             '\n\t2. There could be encoding issues that are corrupting the data.')
 
 
 class KeyPathError(Exception):
@@ -1148,7 +1188,7 @@ class KeyPathError(Exception):
             super().__init__('\n<path> is an invalid structure path.\nSome things that may have gone wrong:'
                              '\n\t1. The path may lead to a list... Integer characters must be used as an index to '
                              'gain access to any list within the data structure.\n\t2. The path may not exist.'
-                             '\n\t3. Keys within the json file may contain the same characters used as the path '
+                             '\n\t3. Keys within the JSON file may contain the same characters used as the path '
                              'separator properties... if that is the case change the path separator properties using '
                              '<self.set_path_separator_properties()>.\n\t4. The path separator properties may have '
                              'been typed incorrectly or changed.\n\t5. There may be a key being used that is not supported.')
@@ -1158,7 +1198,7 @@ class AddError(Exception):
     def __init__(self, message: str = None) -> None:
         if message is None:
             super().__init__('(<value> cannot be added because <structure_path> leads to a mutable object.)'
-                             ' - OR - (A non-json object/pair was attempting to be add to a json container.)'
+                             ' - OR - (A non-JSON object/pair was attempting to be add to a JSON container.)'
                              '\nSet the <create> argument to True so that a list will automatically be created '
                              'including the unsupported object and the new <value>.')
 
