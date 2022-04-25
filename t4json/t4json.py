@@ -3,14 +3,14 @@ from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth, HTTPProxyAuth
 
 
 class T4Json:
-
     __slots__: tuple = (
         '__file_path__', 'ignore_method_errors', 'indentation', 'sort_keys', 'only_ascii', '__json_separators__',
         '__path_separator__', '__relative_path_command__', '__relative_back_path_command__',
         '__working_level__', '__root__', '__data__')
 
-    def __init__(self, source: str = None, create: bool = False, api_parameters: dict or list or bytes = None,
-                 api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False):
+    def __init__(self, source: str = None, create: bool = False, url_parameters: dict or list or bytes = None,
+                 url_headers: dict or list or bytes = None, url_user_auth: any = None, encoding: str = 'utf-8',
+                 encoding_errors: str = 'ignore', decode_html_entities: bool = False):
         self.__file_path__: str or None = None  # used throughout the class to open, write and read to JSON files
 
         # user_settings
@@ -30,11 +30,13 @@ class T4Json:
         self.__data__: dict = {self.__root__: {}}
 
         if source is not None:
-            self.load(source=source, create=create, api_parameters=api_parameters,
-                      api_authentication=api_authentication, encoding=encoding, encoding_errors=encoding_errors,
+            self.load(source=source, create=create, url_parameters=url_parameters, url_headers=url_headers,
+                      url_user_auth=url_user_auth, encoding=encoding, encoding_errors=encoding_errors,
                       decode_html_entities=decode_html_entities)
 
-    def add(self, value: dict or list or str or float or int or bool or None, path: str = '', existing_keys: str = 'pass', create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False, ignore_errors: bool = None) -> None:
+    def add(self, value: dict or list or str or float or int or bool or None, path: str = '',
+            existing_keys: str = 'pass', create: bool = False, index: int or str or None = None,
+            integrate_list_with_list: bool = False, ignore_errors: bool = None) -> None:
         """Adds *value* to the base... or elsewhere if specified by *path*."""
 
         # parameter setup
@@ -70,10 +72,13 @@ class T4Json:
                         else:
                             data.update({k: v})
                     for k in duplicates:
-                        self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}', existing_keys=existing_keys,
+                        self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}',
+                                 existing_keys=existing_keys,
                                  create=True, index=index, integrate_list_with_list=True, ignore_errors=ignore_errors)
                 else:
-                    self.__raise_error__(ArgumentError('<existing_pairs> must be equal to "pass", "replace", "combine" or "integrate".'), ignore_errors)
+                    self.__raise_error__(
+                        ArgumentError('<existing_pairs> must be equal to "pass", "replace", "combine" or "integrate".'),
+                        ignore_errors)
                     self.add(value, path, create=create, index=index, integrate_list_with_list=True,
                              ignore_errors=ignore_errors)  # recursive step
             else:
@@ -163,7 +168,8 @@ class T4Json:
 
         # main
         try:
-            if not (path.endswith(self.__path_separator__ + new_key) or path == new_key):  # De Morgan's law - boolean logic
+            if not (path.endswith(
+                    self.__path_separator__ + new_key) or path == new_key):  # De Morgan's law - boolean logic
                 data: tuple = self.__walk_path__(path=path)
 
                 if new_key not in data[0]:
@@ -187,7 +193,8 @@ class T4Json:
                         if existing_key == 'combine':
                             self.change_value(path=new_path, new_value=[self.read(path=new_path), self.read(path=path)])
                         elif existing_key == 'integrate':
-                            self.add(value=data[0][data[1]], path=new_path, existing_keys='integrate', integrate_list_with_list=True, create=True)
+                            self.add(value=data[0][data[1]], path=new_path, existing_keys='integrate',
+                                     integrate_list_with_list=True, create=True)
                         elif existing_key == 'replace':
                             self.change_value(path=new_path, new_value=self.read(path=path))
                         elif existing_key == 'pass':
@@ -245,7 +252,9 @@ class T4Json:
                                  integrate_list_with_list=integrate_list_with_list)
 
             else:
-                self.__raise_error__(error=ArgumentError('Cannot move the current level - <from_path> - further into itself.'), ignore=ignore_errors)
+                self.__raise_error__(
+                    error=ArgumentError('Cannot move the current level - <from_path> - further into itself.'),
+                    ignore=ignore_errors)
         except KeyPathError:
             self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
 
@@ -264,17 +273,22 @@ class T4Json:
                 data: tuple = self.__walk_path__(path=from_path)
 
                 if only_contents:
-                    self.add(value=data[0][data[1]], path=to_path, existing_keys=existing_keys, create=create, index=index,
+                    self.add(value=data[0][data[1]], path=to_path, existing_keys=existing_keys, create=create,
+                             index=index,
                              integrate_list_with_list=True)
                 else:
                     if isinstance(data[1], str):  # if the key is a string I know that it must be for a pair
-                        self.add(value={data[1]: data[0][data[1]]}, path=to_path, existing_keys=existing_keys, create=create, index=index,
+                        self.add(value={data[1]: data[0][data[1]]}, path=to_path, existing_keys=existing_keys,
+                                 create=create, index=index,
                                  integrate_list_with_list=integrate_list_with_list)
                     else:  # if the key is an integer I know it must be an index to a list
-                        self.add(value=data[0][data[1]], path=to_path, existing_keys=existing_keys, create=create, index=index,
+                        self.add(value=data[0][data[1]], path=to_path, existing_keys=existing_keys, create=create,
+                                 index=index,
                                  integrate_list_with_list=integrate_list_with_list)
             else:
-                self.__raise_error__(error=ArgumentError('Cannot copy the current level - <from_path> - further into itself.'), ignore=ignore_errors)
+                self.__raise_error__(
+                    error=ArgumentError('Cannot copy the current level - <from_path> - further into itself.'),
+                    ignore=ignore_errors)
         except KeyPathError:
             self.__raise_error__(error=KeyPathError, ignore=ignore_errors)
 
@@ -332,6 +346,7 @@ class T4Json:
                                     self.delete(path=f'{path}{self.__path_separator__}{i}')
                     except IndexError:
                         recursive_func()
+
                 recursive_func()
 
         except KeyPathError:
@@ -369,7 +384,8 @@ class T4Json:
 
         # parameter setup
         if chain_key and chain_key_separator == self.__path_separator__:
-            raise ArgumentError(f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator__}".')
+            raise ArgumentError(
+                f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator__}".')
         if self.is_path_relative(path):
             path: str = self.__interpret_path__(path=path, return_as_str=True)
         self.set_working_level(path='')
@@ -405,7 +421,8 @@ class T4Json:
                                         self.move_from_to(
                                             from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
                                             to_path=f'{path}{self.__path_separator__}{key}', only_contents=True,
-                                            existing_keys=existing_keys, index=list_index, integrate_list_with_list=True)
+                                            existing_keys=existing_keys, index=list_index,
+                                            integrate_list_with_list=True)
                                     recursive_func()
                                     return
                                 elif pull_pairs_from_lists and isinstance(container[key][index], dict):
@@ -415,12 +432,14 @@ class T4Json:
                                             for key_ in list(container[key][index]):
                                                 self.change_key(
                                                     path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}{self.__path_separator__}{key_}',
-                                                    new_key=f'{key}{chain_key_separator}{index}{chain_key_separator}{key_}', existing_key='integrate')
+                                                    new_key=f'{key}{chain_key_separator}{index}{chain_key_separator}{key_}',
+                                                    existing_key='integrate')
                                         else:
                                             for key_ in list(container[key][index]):
                                                 self.change_key(
                                                     path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}{self.__path_separator__}{key_}',
-                                                    new_key=f'{key}{chain_key_separator}{key_}', existing_key='integrate')
+                                                    new_key=f'{key}{chain_key_separator}{key_}',
+                                                    existing_key='integrate')
 
                                     self.move_from_to(
                                         from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
@@ -578,11 +597,13 @@ class T4Json:
                 if only_values_of_pairs:
                     return [i for d in data if isinstance(d, dict) for i in d.values()]
                 else:
-                    return [d for d in data if not isinstance(d, dict)] + [i for d in data if isinstance(d, dict) for i in d.values()]
+                    return [d for d in data if not isinstance(d, dict)] + [i for d in data if isinstance(d, dict) for i
+                                                                           in d.values()]
         except KeyPathError:
             self.__raise_error__(KeyPathError, ignore_errors)
 
-    def all_keys(self, path: str = '', search_lists: bool = True, as_paths: bool = False, ignore_errors: bool = None) -> list:
+    def all_keys(self, path: str = '', search_lists: bool = True, as_paths: bool = False,
+                 ignore_errors: bool = None) -> list:
         """Returns a list of all the keys past a certain point which is specified by *path*. This method only returns0
          keys that have a non-container value"""
 
@@ -599,7 +620,8 @@ class T4Json:
                 else:
                     current_path_separator: str = data.__path_separator__
                     data.set_path_separator_properties(separator='_')
-                    data.flatten(chain_key=as_paths, chain_include_index=True, chain_key_separator=current_path_separator,
+                    data.flatten(chain_key=as_paths, chain_include_index=True,
+                                 chain_key_separator=current_path_separator,
                                  flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
             elif isinstance(data.__data__[data.__root__], list):
@@ -615,7 +637,8 @@ class T4Json:
                 else:
                     current_path_separator: str = data.__path_separator__
                     data.set_path_separator_properties(separator='_')
-                    data.flatten(chain_key=as_paths, chain_include_index=True, chain_key_separator=current_path_separator,
+                    data.flatten(chain_key=as_paths, chain_include_index=True,
+                                 chain_key_separator=current_path_separator,
                                  flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
 
@@ -658,7 +681,8 @@ class T4Json:
         except AttributeError:
             pass
 
-    def all_pairs(self, path: str = '', search_lists: bool = True, as_dictionaries: bool = False, ignore_errors: bool = None) -> list:
+    def all_pairs(self, path: str = '', search_lists: bool = True, as_dictionaries: bool = False,
+                  ignore_errors: bool = None) -> list:
         """Returns a list of tuples of all (key, value) pairs as - [(key, value), (key, value)..] past a point
         specified by *path*."""
 
@@ -778,7 +802,8 @@ class T4Json:
         """Any non-critical errors (such as the path being incorrect) will be ignored."""
         self.ignore_method_errors: bool = boolean
 
-    def set_path_separator_properties(self, separator: str = None, relative: str = None, relative_back: str = None) -> None:
+    def set_path_separator_properties(self, separator: str = None, relative: str = None,
+                                      relative_back: str = None) -> None:
         """Sets the path separator and relative path navigation properties."""
 
         # parameter setup
@@ -880,30 +905,31 @@ class T4Json:
         else:
             if path in ('.', '..'):
                 return True
-            elif path.startswith(self.__relative_back_path_command__ + self.__path_separator__) or path.startswith(self.__relative_path_command__ + self.__path_separator__):
+            elif path.startswith(self.__relative_back_path_command__ + self.__path_separator__) or path.startswith(
+                    self.__relative_path_command__ + self.__path_separator__):
                 return True
             else:
                 return False
 
-    def load(self, source: str, create: bool = False, api_parameters: dict or list or bytes = None, api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
+    def load(self, source: str, create: bool = False, url_parameters: dict or list or bytes = None,
+             url_headers: any = None, url_user_auth: any = None, encoding: str = 'utf-8',
+             encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
         """This method loads the JSON data. It can receive a File Path, URL, or JSON String."""
-
-        try:
+        from os.path import exists as file_path_exists
+        if source.startswith('http'):
+            self.load_from_url(url=source, url_parameters=url_parameters, url_headers=url_headers,
+                               url_user_auth=url_user_auth,
+                               encoding=encoding, encoding_errors=encoding_errors,
+                               decode_html_entities=decode_html_entities)
+        elif file_path_exists(source):
             self.load_file(file_path=source, create=create, encoding=encoding, encoding_errors=encoding_errors,
                            decode_html_entities=decode_html_entities)
-        except LoadFileError:
-            try:
-                self.load_from_string(string=source, encoding=encoding, encoding_errors=encoding_errors,
-                                      decode_html_entities=decode_html_entities)
-            except LoadStringError:
-                try:
-                    self.load_from_url(url=source, api_parameters=api_parameters, api_authentication=api_authentication,
-                                       encoding=encoding, encoding_errors=encoding_errors,
-                                       decode_html_entities=decode_html_entities)
-                except LoadURLError:
-                    raise LoadError
+        else:
+            self.load_from_string(string=source, encoding=encoding, encoding_errors=encoding_errors,
+                                  decode_html_entities=decode_html_entities)
 
-    def load_file(self, file_path: str, create: bool = False, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
+    def load_file(self, file_path: str, create: bool = False, encoding: str = 'utf-8', encoding_errors: str = 'ignore',
+                  decode_html_entities: bool = False) -> None:
         """Loads the JSON data from a specified file."""
 
         try:
@@ -928,7 +954,8 @@ class T4Json:
             raise LoadFileError(
                 'There was an error retrieving the JSON data from file. It may be corrupted or <encoding> could be incorrect.')
 
-    def load_from_string(self, string: str or bytes, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
+    def load_from_string(self, string: str or bytes, encoding: str = 'utf-8', encoding_errors: str = 'ignore',
+                         decode_html_entities: bool = False) -> None:
         """Loads JSON data from a string."""
 
         try:
@@ -944,15 +971,21 @@ class T4Json:
         except BaseException:
             raise LoadStringError('<string> is invalid JSON data.')
 
-    def load_from_url(self, url: str, api_parameters: dict or list or bytes = None, api_authentication: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
+    def load_from_url(self, url: str, url_parameters: dict or list or bytes = None, url_headers: dict = None,
+                      url_user_auth: any = None, encoding: str = 'utf-8', encoding_errors: str = 'ignore',
+                      decode_html_entities: bool = False) -> None:
         """Loads JSON data from the specified URL."""
         from requests import get as geturl
 
         try:
             if decode_html_entities:
-                data: dict or list = json.loads(self.__decode_html_entities(geturl(url=url, params=api_parameters, auth=api_authentication).content.decode(encoding=encoding, errors=encoding_errors)))
+                data: dict or list = json.loads(self.__decode_html_entities(
+                    geturl(url=url, params=url_parameters, auth=url_user_auth).content.decode(encoding=encoding,
+                                                                                              errors=encoding_errors)))
             else:
-                data: dict or list = json.loads(geturl(url=url, params=api_parameters, auth=api_authentication).content.decode(encoding=encoding, errors=encoding_errors))
+                data: dict or list = json.loads(
+                    geturl(url=url, params=url_parameters, headers=url_headers, auth=url_user_auth).content.decode(
+                        encoding=encoding, errors=encoding_errors))
             self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
             self.set_working_level('')
             self.__file_path__: str or None = None
@@ -980,6 +1013,7 @@ class T4Json:
                 only_ascii: bool = None, separators: tuple = None, encoding: str = 'utf-8',
                 encoding_errors: str = 'strict') -> None:
         """Saves the current JSON data as a new file."""
+        from os.path import exists as file_path_exists
 
         if indent is None:
             indent: int or str or None = self.indentation
@@ -990,8 +1024,7 @@ class T4Json:
         if separators is None:
             separators: tuple = self.__json_separators__
 
-        from os.path import exists as file_path_exist
-        if not file_path_exist(file_path) or overwrite:
+        if not file_path_exists(file_path) or overwrite:
             with open(file_path, 'w', encoding=encoding, errors=encoding_errors) as file:
                 json.dump(obj=self.__data__[self.__root__], fp=file, skipkeys=True, indent=indent, sort_keys=sort_keys,
                           ensure_ascii=only_ascii, separators=separators)
@@ -1048,7 +1081,8 @@ class T4Json:
                         left_count += 1
                     else:
                         break
-                out: list = working_level.split(self.__path_separator__)[:-left_count] + path.split(self.__path_separator__)[left_count:]
+                out: list = working_level.split(self.__path_separator__)[:-left_count] + path.split(
+                    self.__path_separator__)[left_count:]
 
             elif path.startswith(working):  # if work at current working level
                 out: list = working_level.split(self.__path_separator__) + path.split(self.__path_separator__)[1:]
@@ -1093,7 +1127,8 @@ class T4Json:
         # main
         try:
             if not path_[0] == '':
-                parent_of_target_level: dict or list = self.__data__[self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
+                parent_of_target_level: dict or list = self.__data__[
+                    self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
             else:
                 parent_of_target_level: dict = self.__data__  # level iterator... used to assign each level as it walks down the data structure.
 
@@ -1107,9 +1142,12 @@ class T4Json:
                     parent_of_target_level: dict or list = parent_of_target_level[int(key)]
 
             target_level_key: str = path_[-1]
+
             # Return level
 
-            def catch_invalid_path(target_key) -> any: return parent_of_target_level[target_key]
+            def catch_invalid_path(target_key) -> any:
+                return parent_of_target_level[target_key]
+
             if isinstance(parent_of_target_level, dict):
                 try:  # since the target level is not checked in the for loop check it here
                     catch_invalid_path(target_level_key)
@@ -1132,35 +1170,22 @@ class T4Json:
 
                 return parent_of_target_level, target_level_key
             else:  # elif - is list
-                catch_invalid_path(int(target_level_key))  # since the target level is not checked in the for loop check it here
+                catch_invalid_path(
+                    int(target_level_key))  # since the target level is not checked in the for loop check it here
                 return parent_of_target_level, int(target_level_key)
         except (KeyError, ValueError, TypeError, IndexError):
             raise KeyPathError
 
 
-class LoadError(Exception):
-    def __init__(self, message: str = None) -> None:
-        if message is None:
-            super().__init__('JSON data could not be loaded.\nSome things that may have gone wrong:'
-                             '\n\t1. A file was attempting to be loaded that does not exist. - Set the '
-                             '<create> argument to True so that if a file does not exist it will be '
-                             'created.\n\t2. If JSON data was attempting to be read from a URL - access '
-                             'was denied, URL does not exist or there are connection issues.'
-                             '\n\t3. A string was attempting to be loaded but failed because of incorrect JSON '
-                             'data format.\n\t4. JSON data could be corrupted.\n\t5. There could be encoding issues '
-                             'that are corrupting the data.')
-
-
 class LoadFileError(Exception):
     def __init__(self, message: str = None) -> None:
         if message is None:
-            super().__init__('JSON data could not be loaded.\nSome things that may have gone wrong:'
-                             '\n\t1. A file was attempting to be loaded that does not exist. - Set the '
-                             '<create> argument to True so that if a file does not exist it will be '
-                             'created.\n\t2. If JSON data was attempting to be read from a URL - access '
-                             'was denied, URL does not exist or there are connection issues.'
-                             '\n\t3. JSON data could be corrupted.\n\t4. There could be encoding issues '
-                             'that are corrupting the data.')
+            super().__init__('JSON data could not be loaded.'
+                             '\nSome things that may have gone wrong:'
+                             '\n\t1. A file that does not exist was attempting to be loaded. - Set the <create> '
+                             'argument to True so that if a file does not exist it will be created.'
+                             '\n\t2. JSON data could be corrupted.'
+                             '\n\t3. There could be encoding issues that are corrupting the data.')
 
 
 class LoadURLError(Exception):
@@ -1176,10 +1201,13 @@ class LoadURLError(Exception):
 class LoadStringError(Exception):
     def __init__(self, message: str = None) -> None:
         if message is None:
-            super().__init__('JSON data could not be loaded.'
+            super().__init__('JSON data could not be loaded from <string>.'
                              '\nSome things that may have gone wrong:'
                              '\n\t1. JSON data is corrupted.'
                              '\n\t2. There could be encoding issues that are corrupting the data.')
+
+
+LoadError: tuple = (LoadFileError, LoadURLError, LoadStringError)
 
 
 class KeyPathError(Exception):
@@ -1217,7 +1245,8 @@ def is_valid_json_data(source: str) -> bool:
         return False
 
 
-def convert_to_valid_json_ready_data(value: dict or list or tuple or str or float or int or bool or None) -> dict or list or str or float or int or bool or None:
+def convert_to_valid_json_ready_data(
+        value: dict or list or tuple or str or float or int or bool or None) -> dict or list or str or float or int or bool or None:
     """Converts *value* into JSON ready data. It will remove any unsupported keys and convert the keys that are not string into strings."""
 
     if isinstance(value, (dict, list, tuple)):
@@ -1231,6 +1260,8 @@ def deserialize_from_string(string: str) -> dict or list or str or int or float 
     return json.loads(string)
 
 
-def serialize_to_string(value: dict or list or str or int or float or bool or None, indent: None or int or str = None, sort_keys: bool = False, only_ascii: bool = False, separators: tuple = (', ', ': ')) -> str:
+def serialize_to_string(value: dict or list or str or int or float or bool or None, indent: None or int or str = None,
+                        sort_keys: bool = False, only_ascii: bool = False, separators: tuple = (', ', ': ')) -> str:
     """Returns a JSON formatted string from *value*. This string can then... for example be saved to a file."""
-    return json.dumps(value, skipkeys=True, ensure_ascii=only_ascii, sort_keys=sort_keys, indent=indent, separators=separators)
+    return json.dumps(value, skipkeys=True, ensure_ascii=only_ascii, sort_keys=sort_keys, indent=indent,
+                      separators=separators)
