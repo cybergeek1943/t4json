@@ -36,7 +36,7 @@ Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json)
 &emsp;
 
 ### Notes
-- All methods within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy… or you can use the copy module to make a deep copy.
+- All methods (where applicable) within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy… or you can use the copy module to make a deep copy. You can access the deserialized data through the ```data``` property of the T4Json class.
 - Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data…
 
 &emsp;
