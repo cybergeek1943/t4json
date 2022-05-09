@@ -6,7 +6,7 @@ This module should work on any installation of python 3.6
 or later on any OS right out of the box.
 
 __Outline:__
-- Open up json data from a file, url, or string with the T4Json class.
+- Open up json data from a file, URL/Endpoint, or string with the T4Json class.
 - Use methods to make some changes.
 - Save changes.
 - That's it. Your done..
