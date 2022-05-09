@@ -33,8 +33,8 @@ class T4Json:
 
         # off limit __vars__
         self.__known_objects_for_path: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
-                                                 'list': list, 'tuple': tuple, 'frozenset': frozenset,
-                                                 'set': set, 'dict': dict, 'str': str, 'object': object, }
+                                               'list': list, 'tuple': tuple, 'frozenset': frozenset,
+                                               'set': set, 'dict': dict, 'str': str, 'object': object, }
         self.__json_separators: tuple = (', ', ': ')  # index 0 is for items and index 1 is fore pairs keys and values
         self.__path_separator: str = '\\\\'
         self.__relative_path_command: str = '.'
