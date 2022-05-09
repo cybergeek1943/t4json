@@ -15,15 +15,15 @@ from typing import Any
 class T4Json:
 
     __slots__: tuple = (
-        '__file_path__', 'ignore_method_errors', 'indentation', 'sort_keys', 'only_ascii', '__known_objects_for_path__',
-        '__json_separators__', '__path_separator__', '__relative_path_command__', '__relative_back_path_command__',
-        '__working_level__', '__root__', '__data__')
+        '__file_path', 'ignore_method_errors', 'indentation', 'sort_keys', 'only_ascii', '__known_objects_for_path',
+        '__json_separators', '__path_separator', '__relative_path_command', '__relative_back_path_command',
+        '__working_level', '__root', '__data')
 
     def __init__(self, source: str or bytes or dict or list = None, url_parameters: dict or list or bytes = None,
                  url_headers: dict = None, url_body: Any = None, url_user_auth: Any = None,
                  url_request_method: str = 'GET', url_raise_for_status: bool = False, create: bool = False,
                  encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False):
-        self.__file_path__: str or None = None  # used throughout the class to open, write and read to JSON files
+        self.__file_path: str or None = None  # used throughout the class to open, write and read to JSON files
 
         # user_settings
         self.ignore_method_errors: bool = False
@@ -32,17 +32,17 @@ class T4Json:
         self.only_ascii: bool = False
 
         # off limit __vars__
-        self.__known_objects_for_path__: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
+        self.__known_objects_for_path: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
                                                  'list': list, 'tuple': tuple, 'frozenset': frozenset,
                                                  'set': set, 'dict': dict, 'str': str, 'object': object, }
-        self.__json_separators__: tuple = (', ', ': ')  # index 0 is for items and index 1 is fore pairs keys and values
-        self.__path_separator__: str = '\\\\'
-        self.__relative_path_command__: str = '.'
-        self.__relative_back_path_command__: str = '..'
-        self.__working_level__: str = ''
-        self.__root__: str = ''
+        self.__json_separators: tuple = (', ', ': ')  # index 0 is for items and index 1 is fore pairs keys and values
+        self.__path_separator: str = '\\\\'
+        self.__relative_path_command: str = '.'
+        self.__relative_back_path_command: str = '..'
+        self.__working_level: str = ''
+        self.__root: str = ''
 
-        self.__data__: dict = {self.__root__: {}}
+        self.__data: dict = {self.__root: {}}
 
         if source is not None:
             self.load(source=source, url_parameters=url_parameters, url_headers=url_headers, url_body=url_body,
@@ -62,7 +62,7 @@ class T4Json:
 
         # main
         try:
-            data_: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+            data_: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
             data: dict or list or str or float or int or bool or None = data_[0][data_[1]]
             if isinstance(data, dict):
                 if existing_keys == 'replace':
@@ -79,9 +79,9 @@ class T4Json:
                             data.update({k: v})
                     for k in duplicates:
                         if not isinstance(data[k], list):
-                            self.change_value(f'{path}{self.__path_separator__}{k}', [data[k], duplicates[k]])
+                            self.change_value(f'{path}{self.__path_separator}{k}', [data[k], duplicates[k]])
                         else:
-                            self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}',
+                            self.add(value=duplicates[k], path=f'{path}{self.__path_separator}{k}',
                                      existing_keys=existing_keys, create=True, index=index, integrate_list_with_list=False, ignore_errors=ignore_errors)
                 elif existing_keys == 'integrate':
                     duplicates: dict = {}
@@ -91,10 +91,10 @@ class T4Json:
                         else:
                             data.update({k: v})
                     for k in duplicates:
-                        self.add(value=duplicates[k], path=f'{path}{self.__path_separator__}{k}',
+                        self.add(value=duplicates[k], path=f'{path}{self.__path_separator}{k}',
                                  existing_keys=existing_keys, create=True, index=index, integrate_list_with_list=True, ignore_errors=ignore_errors)
                 else:
-                    self.__raise_error__(ArgumentError('<existing_pairs> must be equal to "pass", "replace", "combine" or "integrate".'), ignore_errors)
+                    self.__raise_error(ArgumentError('<existing_pairs> must be equal to "pass", "replace", "combine" or "integrate".'), ignore_errors)
                     self.add(value, path, create=create, index=index, integrate_list_with_list=True,
                              ignore_errors=ignore_errors)  # recursive step
             else:
@@ -118,7 +118,7 @@ class T4Json:
                         elif index == '4q':
                             index: None = None
                         else:
-                            self.__raise_error__(error=ArgumentError(
+                            self.__raise_error(error=ArgumentError(
                                 'If <index> is a string it must be - "center", "half", "0q", "1q", "2q", "3q", "4q '
                                 'or a positive integer within a string that represents a percentage of where to '
                                 'place the <value>."'), ignore=ignore_errors)
@@ -135,7 +135,7 @@ class T4Json:
         except (AttributeError, TypeError):
             if create:
                 if path == '':
-                    self.__data__[self.__root__] = [self.__data__[self.__root__]]
+                    self.__data[self.__root] = [self.__data[self.__root]]
                     self.add(value=value, path='', existing_keys=existing_keys, create=create, index=index,
                              integrate_list_with_list=integrate_list_with_list, ignore_errors=ignore_errors)
                 else:
@@ -143,19 +143,19 @@ class T4Json:
                     self.add(value=value, path=path, existing_keys=existing_keys, create=create, index=index,
                              integrate_list_with_list=integrate_list_with_list, ignore_errors=ignore_errors)
             else:
-                self.__raise_error__(AddError, ignore_errors)
+                self.__raise_error(AddError, ignore_errors)
 
     def change_value(self, path: str, new_value: dict or list or str or float or int or bool or None,
                      ignore_errors: bool = None) -> 'T4Json':
         """Changes the value of the key/index that *path* leads to."""
-        data: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data[0][data[1]] = new_value
 
         if self.is_path_relative(path):
-            path: str = self.__interpret_path__(path, return_as_str=True)  # in-case <path> is relative
-        if self.__working_level__.startswith(path):
-            if self.__path_separator__ in path:
-                self.set_working_level(self.__path_separator__.join(path.split(self.__path_separator__)[:-1]))
+            path: str = self.__interpret_path(path, return_as_str=True)  # in-case <path> is relative
+        if self.__working_level.startswith(path):
+            if self.__path_separator in path:
+                self.set_working_level(self.__path_separator.join(path.split(self.__path_separator)[:-1]))
             else:
                 self.set_working_level(path='')
 
@@ -169,31 +169,31 @@ class T4Json:
         if ignore_errors is None:
             ignore_errors: bool = self.ignore_method_errors
         if path == '':
-            self.__raise_error__(error=KeyPathError('<path> must be/(lead to) a key.'), ignore=ignore_errors)
+            self.__raise_error(error=KeyPathError('<path> must be/(lead to) a key.'), ignore=ignore_errors)
             return self
         if self.is_path_relative(path):
-            path: str = self.__interpret_path__(path, return_as_str=True)
+            path: str = self.__interpret_path(path, return_as_str=True)
         new_key: str = str(new_key)
 
         # main
         try:
-            if not (path.endswith(self.__path_separator__ + new_key) or path == new_key):
-                data: tuple = self.__walk_path__(path=path)
+            if not (path.endswith(self.__path_separator + new_key) or path == new_key):
+                data: tuple = self.__walk_path(path=path)
 
                 if new_key not in data[0]:
                     data[0][new_key] = data[0].pop(data[1])  # replaces key in dict with new key while keeping the value
 
-                    if self.__working_level__.startswith(path):  # TODO: test this
-                        new_working_level = self.__working_level__.split(self.__path_separator__)
-                        new_working_level[len(path.split(self.__path_separator__)) - 1] = new_key
-                        self.set_working_level(path=self.__path_separator__.join(new_working_level))
+                    if self.__working_level.startswith(path):  # TODO: test this
+                        new_working_level = self.__working_level.split(self.__path_separator)
+                        new_working_level[len(path.split(self.__path_separator)) - 1] = new_key
+                        self.set_working_level(path=self.__path_separator.join(new_working_level))
 
                 else:  # if a key does already exist with the same name
                     if existing_key in ('combine', 'integrate', 'replace', 'pass'):
 
-                        if self.__path_separator__ in path:
-                            new_path: str = self.__interpret_path__(
-                                f'{self.__relative_back_path_command__}{self.__path_separator__}{new_key}',
+                        if self.__path_separator in path:
+                            new_path: str = self.__interpret_path(
+                                f'{self.__relative_back_path_command}{self.__path_separator}{new_key}',
                                 working_level=path, return_as_str=True)
                         else:
                             new_path: str = new_key
@@ -207,12 +207,12 @@ class T4Json:
                         elif existing_key == 'pass':
                             return self
 
-                        if self.__working_level__.startswith(new_path) or self.__working_level__.startswith(path):
+                        if self.__working_level.startswith(new_path) or self.__working_level.startswith(path):
                             self.set_working_level(path=new_path)
 
                         self.delete(path)
                     elif existing_key == 'error':
-                        self.__raise_error__(ArgumentError('\n\n<new_key> is already being used on this level.'
+                        self.__raise_error(ArgumentError('\n\n<new_key> is already being used on this level.'
                                                            '\n\nSet the <existing_key> argument to "combine" so that '
                                                            'the values will be combined into a list.\nSet the '
                                                            '<existing_key> argument to "integrate" so that the values '
@@ -223,12 +223,12 @@ class T4Json:
                                                            'the key that already exists will have its value be '
                                                            'replaced by the key being renamed.'), ignore_errors)
                     else:
-                        self.__raise_error__(ArgumentError('<existing_pair> argument must be equal to "combine", '
+                        self.__raise_error(ArgumentError('<existing_pair> argument must be equal to "combine", '
                                                            '"integrate", "replace", "pass" or "error".'), ignore_errors)
 
             return self
         except (IndexError, TypeError):
-            self.__raise_error__(
+            self.__raise_error(
                 IndexError('The path you entered leads to a list... Use a path that leads to a JSON object/dict pair.'),
                 ignore_errors)
 
@@ -247,18 +247,18 @@ class T4Json:
             be in the format of: (<value>, <key>, <parent_level>)... the (deleted key and value) and parent level."""
             # parameter setup
             if self.is_path_relative(path):
-                path: str = self.__interpret_path__(path=path, return_as_str=True)  # in-case <path> is relative
+                path: str = self.__interpret_path(path=path, return_as_str=True)  # in-case <path> is relative
             if path == '':
-                self.__raise_error__(KeyPathError, ignore_errors)
+                self.__raise_error(KeyPathError, ignore_errors)
                 return
 
             # main
-            data: tuple = self.__walk_path__(path=path)
+            data: tuple = self.__walk_path(path=path)
             out: dict or str or list or int or float or bool or None = data[0].pop(data[1])
 
-            if self.__working_level__.startswith(path):
-                if self.__path_separator__ in path:
-                    self.set_working_level(self.__path_separator__.join(path.split(self.__path_separator__)[:-1]))
+            if self.__working_level.startswith(path):
+                if self.__path_separator in path:
+                    self.set_working_level(self.__path_separator.join(path.split(self.__path_separator)[:-1]))
                 else:
                     self.set_working_level(path='')
 
@@ -280,7 +280,7 @@ class T4Json:
                              integrate_list_with_list=integrate_list_with_list)
 
         else:
-            self.__raise_error__(error=ArgumentError('Cannot move the current level - <from_path> - further into itself.'), ignore=ignore_errors)
+            self.__raise_error(error=ArgumentError('Cannot move the current level - <from_path> - further into itself.'), ignore=ignore_errors)
 
         return self
 
@@ -289,7 +289,7 @@ class T4Json:
                      ignore_errors: bool = None) -> 'T4Json':
         """Copy's data from *from_path* to *to_path*."""
         if not to_path.startswith(from_path):
-            data: tuple = self.__walk_path__(path=from_path, ignore_path_errors=ignore_errors)
+            data: tuple = self.__walk_path(path=from_path, ignore_path_errors=ignore_errors)
 
             if only_contents:
                 self.add(value=data[0][data[1]], path=to_path, existing_keys=existing_keys, create=create, index=index,
@@ -302,7 +302,7 @@ class T4Json:
                     self.add(value=data[0][data[1]], path=to_path, existing_keys=existing_keys, create=create, index=index,
                              integrate_list_with_list=integrate_list_with_list)
         else:
-            self.__raise_error__(error=ArgumentError('Cannot copy the current level - <from_path> - further into itself.'), ignore=ignore_errors)
+            self.__raise_error(error=ArgumentError('Cannot copy the current level - <from_path> - further into itself.'), ignore=ignore_errors)
 
         return self
 
@@ -313,18 +313,18 @@ class T4Json:
         if ignore_errors is None:
             ignore_errors: bool = self.ignore_method_errors
         if self.is_path_relative(path):
-            path: str = self.__interpret_path__(path=path, return_as_str=True)  # in-case <path> is relative
+            path: str = self.__interpret_path(path=path, return_as_str=True)  # in-case <path> is relative
         if path == '':
-            self.__raise_error__(ArgumentError('<path> must lead to a key.'), ignore_errors)
+            self.__raise_error(ArgumentError('<path> must lead to a key.'), ignore_errors)
             return self
 
         # main
-        data: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data[0].pop(data[1])
 
-        if self.__working_level__.startswith(path):
-            if self.__path_separator__ in path:
-                self.set_working_level(self.__path_separator__.join(path.split(self.__path_separator__)[:-1]))
+        if self.__working_level.startswith(path):
+            if self.__path_separator in path:
+                self.set_working_level(self.__path_separator.join(path.split(self.__path_separator)[:-1]))
             else:
                 self.set_working_level(path='')
 
@@ -333,21 +333,21 @@ class T4Json:
     def delete_empty_containers(self, path: str = '', ignore_errors: bool = None) -> 'T4Json':
         """Deletes any keys with empty containers as values. *path* can be used to select the level where this will take place"""
 
-        data_: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data_: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data: dict or list = data_[0][data_[1]]
 
         if isinstance(data, dict):
             for k in list(data):
                 if isinstance(data[k], (dict, list)):
                     if not data[k]:  # if empty
-                        self.delete(path=f'{path}{self.__path_separator__}{k}')
+                        self.delete(path=f'{path}{self.__path_separator}{k}')
         if isinstance(data, list):
             def recursive_func() -> None:
                 try:
                     for i, v in enumerate(data):
                         if isinstance(v, (dict, list)):
                             if not v:  # if empty
-                                self.delete(path=f'{path}{self.__path_separator__}{i}')
+                                self.delete(path=f'{path}{self.__path_separator}{i}')
                 except IndexError:
                     recursive_func()
             recursive_func()
@@ -356,12 +356,12 @@ class T4Json:
 
     def new(self, new: dict or str or list or int or float or bool or None) -> 'T4Json':
         """Overwrites/replaces all the current data with *new*"""
-        if isinstance(self.__data__[self.__root__], (dict, list)):
-            self.__data__[self.__root__].clear()
-            self.__data__[self.__root__]: Any = new
+        if isinstance(self.__data[self.__root], (dict, list)):
+            self.__data[self.__root].clear()
+            self.__data[self.__root]: Any = new
         else:
-            self.__data__[self.__root__]: Any = new
-        self.__working_level__: str = ''
+            self.__data[self.__root]: Any = new
+        self.__working_level: str = ''
         return self
 
     def wipe(self) -> 'T4Json':
@@ -391,14 +391,14 @@ class T4Json:
         # parameter setup
         if ignore_errors is None:
             ignore_errors: bool = self.ignore_method_errors
-        if chain_key and chain_key_separator == self.__path_separator__:
-            self.__raise_error__(ArgumentError(f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator__}".'), ignore=ignore_errors)
+        if chain_key and chain_key_separator == self.__path_separator:
+            self.__raise_error(ArgumentError(f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator}".'), ignore=ignore_errors)
         if self.is_path_relative(path):
-            path: str = self.__interpret_path__(path=path, return_as_str=True)
+            path: str = self.__interpret_path(path=path, return_as_str=True)
         self.set_working_level(path='')
 
         # main
-        data: tuple = self.__walk_path__(path)
+        data: tuple = self.__walk_path(path)
         container: dict or list = data[0][data[1]]
         if isinstance(container, dict):
             def recursive_func() -> None:
@@ -408,10 +408,10 @@ class T4Json:
                         if chain_key:
                             for key_ in list(container[key]):
                                 self.change_key(
-                                    path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{key_}',
+                                    path=f'{path}{self.__path_separator}{key}{self.__path_separator}{key_}',
                                     new_key=f'{key}{chain_key_separator}{key_}', existing_key='integrate')
 
-                        self.move_from_to(f'{path}{self.__path_separator__}{key}', to_path=path, only_contents=True,
+                        self.move_from_to(f'{path}{self.__path_separator}{key}', to_path=path, only_contents=True,
                                           existing_keys=existing_keys, index=list_index)
                         recursive_func()
                         break
@@ -420,13 +420,13 @@ class T4Json:
                             if isinstance(value, list):
                                 if list_index == 'hold':
                                     self.move_from_to(
-                                        from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
-                                        to_path=f'{path}{self.__path_separator__}{key}', only_contents=True,
+                                        from_path=f'{path}{self.__path_separator}{key}{self.__path_separator}{index}',
+                                        to_path=f'{path}{self.__path_separator}{key}', only_contents=True,
                                         existing_keys=existing_keys, index=index, integrate_list_with_list=True)
                                 else:
                                     self.move_from_to(
-                                        from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
-                                        to_path=f'{path}{self.__path_separator__}{key}', only_contents=True,
+                                        from_path=f'{path}{self.__path_separator}{key}{self.__path_separator}{index}',
+                                        to_path=f'{path}{self.__path_separator}{key}', only_contents=True,
                                         existing_keys=existing_keys, index=list_index, integrate_list_with_list=True)
                                 recursive_func()
                                 return
@@ -436,16 +436,16 @@ class T4Json:
                                     if chain_include_index:
                                         for key_ in list(container[key][index]):
                                             self.change_key(
-                                                path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}{self.__path_separator__}{key_}',
+                                                path=f'{path}{self.__path_separator}{key}{self.__path_separator}{index}{self.__path_separator}{key_}',
                                                 new_key=f'{key}{chain_key_separator}{index}{chain_key_separator}{key_}', existing_key='integrate')
                                     else:
                                         for key_ in list(container[key][index]):
                                             self.change_key(
-                                                path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}{self.__path_separator__}{key_}',
+                                                path=f'{path}{self.__path_separator}{key}{self.__path_separator}{index}{self.__path_separator}{key_}',
                                                 new_key=f'{key}{chain_key_separator}{key_}', existing_key='integrate')
 
                                 self.move_from_to(
-                                    from_path=f'{path}{self.__path_separator__}{key}{self.__path_separator__}{index}',
+                                    from_path=f'{path}{self.__path_separator}{key}{self.__path_separator}{index}',
                                     to_path=path, only_contents=True, existing_keys=existing_keys, index=list_index)
                                 recursive_func()
                                 return
@@ -456,14 +456,14 @@ class T4Json:
                 if list_index == 'hold':
                     for index, value in enumerate(container):
                         if isinstance(value, list):
-                            self.move_from_to(from_path=f'{path}{self.__path_separator__}{index}', to_path=path,
+                            self.move_from_to(from_path=f'{path}{self.__path_separator}{index}', to_path=path,
                                               only_contents=True, existing_keys=existing_keys, index=index)
                             recursive_func()
                             break
                 else:
                     for index, value in enumerate(container):
                         if isinstance(value, list):
-                            self.move_from_to(from_path=f'{path}{self.__path_separator__}{index}', to_path=path,
+                            self.move_from_to(from_path=f'{path}{self.__path_separator}{index}', to_path=path,
                                               only_contents=True, existing_keys=existing_keys, index=list_index)
                             recursive_func()
                             break
@@ -472,7 +472,7 @@ class T4Json:
             if flatten_opposite_container_type:
                 for i, v in enumerate(container):
                     if isinstance(v, dict):
-                        self.flatten(path=f'{path}{self.__path_separator__}{i}', chain_key=chain_key,
+                        self.flatten(path=f'{path}{self.__path_separator}{i}', chain_key=chain_key,
                                      chain_key_separator=chain_key_separator,
                                      flatten_opposite_container_type=flatten_opposite_container_type,
                                      pull_pairs_from_lists=pull_pairs_from_lists,
@@ -485,7 +485,7 @@ class T4Json:
                                 for key in value:
                                     if isinstance(value[key], list):
                                         self.move_from_to(
-                                            from_path=f'{path}{self.__path_separator__}{index}{self.__path_separator__}{key}',
+                                            from_path=f'{path}{self.__path_separator}{index}{self.__path_separator}{key}',
                                             to_path=path, only_contents=True, index=list_index)
                                         recursive_func()
                                         break
@@ -500,14 +500,14 @@ class T4Json:
     def read(self, path: str = '', ignore_errors: bool = None) -> dict or str or list or int or float or bool or None:
         """Returns the value of wherever *path* leads."""
 
-        data: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         return data[0][data[1]]
 
     def pair(self, path: str, as_dictionary: bool = False, ignore_errors: bool = None) -> tuple or dict:
         """Returns a pair in the form of a tuple (<key>, <value>) or dictionary pair {<key>: <value>}
         from wherever *path* leads."""
 
-        data: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         if as_dictionary:
             return {data[1]: data[0][data[1]]}
         else:
@@ -517,7 +517,7 @@ class T4Json:
         """Returns a list of tuples of (key, value) pairs - [(key, value), (key, value)..] of the selected level.
         This method is very similar to the items() method of dict."""
 
-        data_: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data_: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data: dict or str or list or int or float or bool or None = data_[0][data_[1]]
         if isinstance(data, dict):
             if as_dictionaries:
@@ -528,13 +528,13 @@ class T4Json:
     def key(self, path: str, ignore_errors: bool = None) -> str or int or float or bool or None:
         """Returns the key of the value that *path* leads to. If the value is in a list the values index will be
         returned as an integer."""
-        return self.__walk_path__(path=path, ignore_path_errors=ignore_errors)[1]
+        return self.__walk_path(path=path, ignore_path_errors=ignore_errors)[1]
 
     def keys(self, path: str = '', ignore_errors: bool = None) -> list:
         """Returns a list of all the of keys in the location that is specified by *path*. If *path* leads
         to a non-container value than it will return the key of that value."""
 
-        data: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         if isinstance(data[0][data[1]], dict):
             return list(data[0][data[1]])
         elif isinstance(data[0][data[1]], list):
@@ -544,7 +544,7 @@ class T4Json:
         """Returns a list of all the of values in the location that is specified by *path*. If *path* leads
         to a non-container value than that value will simply be returned."""
 
-        data_: tuple = self.__walk_path__(path=path, ignore_path_errors=ignore_errors)
+        data_: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data: dict or str or list or int or float or bool or None = data_[0][data_[1]]
         if isinstance(data, dict):
             return list(data.values())
@@ -564,36 +564,36 @@ class T4Json:
         try:
             data.load_object(deepcopy(self.read(path=path)))
 
-            if isinstance(data.__data__[data.__root__], dict):
+            if isinstance(data.__data[data.__root], dict):
                 if not as_paths:
                     data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
                 else:
-                    current_path_separator: str = data.__path_separator__
+                    current_path_separator: str = data.__path_separator
                     data.set_path_separator_properties(separator=r'_sep-\\//-sep_')
                     data.flatten(chain_key=as_paths, chain_include_index=True, chain_key_separator=current_path_separator,
                                  flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
-            elif isinstance(data.__data__[data.__root__], list):
+            elif isinstance(data.__data[data.__root], list):
                 data.flatten(flatten_opposite_container_type=False, delete_empty_containers=False)
                 out: T4Json = T4Json()
-                for d in data.__data__[data.__root__]:
+                for d in data.__data[data.__root]:
                     if isinstance(d, dict):
                         out.add(value=d, existing_keys='combine')
-                data.load_object(out.__data__[data.__root__])
+                data.load_object(out.__data[data.__root])
                 if not as_paths:
                     data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
                 else:
-                    current_path_separator: str = data.__path_separator__
+                    current_path_separator: str = data.__path_separator
                     data.set_path_separator_properties(separator=r'_sep-\\//-sep_')
                     data.flatten(chain_key=as_paths, chain_include_index=True, chain_key_separator=current_path_separator,
                                  flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
-            return list(data.__data__[data.__root__])
+            return list(data.__data[data.__root])
 
         except (KeyPathError, AddError):
-            data.__raise_error__(ValueError('There was a problem while searching through the JSON data.'), ignore_errors)
+            data.__raise_error(ValueError('There was a problem while searching through the JSON data.'), ignore_errors)
         except AttributeError:
             pass
 
@@ -607,24 +607,24 @@ class T4Json:
         try:
             data.load_object(deepcopy(self.read(path=path)))
 
-            if isinstance(data.__data__[data.__root__], dict):
+            if isinstance(data.__data[data.__root], dict):
                 data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                              pull_lists_from_pairs=True)
-            elif isinstance(data.__data__[data.__root__], list):
+            elif isinstance(data.__data[data.__root], list):
                 data.flatten()
                 out: T4Json = T4Json()
-                for d in data.__data__[data.__root__]:
+                for d in data.__data[data.__root]:
                     if isinstance(d, dict):
                         out.add(value=d, existing_keys='combine')
-                data.load_object(out.__data__[data.__root__])
+                data.load_object(out.__data[data.__root])
                 data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                              pull_lists_from_pairs=True)
 
-            return list(data.__data__[data.__root__].values())
+            return list(data.__data[data.__root].values())
 
         except (KeyPathError, AddError):
-            data.__raise_error__(ValueError('there was a problem while searching through the JSON data.'),
-                                 ignore_errors)
+            data.__raise_error(ValueError('there was a problem while searching through the JSON data.'),
+                               ignore_errors)
         except AttributeError:
             pass
 
@@ -638,24 +638,24 @@ class T4Json:
         try:
             data.load_object(deepcopy(self.read(path=path)))
 
-            if isinstance(data.__data__[data.__root__], dict):
+            if isinstance(data.__data[data.__root], dict):
                 data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                              pull_lists_from_pairs=True)
-            elif isinstance(data.__data__[data.__root__], list):
+            elif isinstance(data.__data[data.__root], list):
                 data.flatten()
                 out: T4Json = T4Json()
-                for d in data.__data__[data.__root__]:
+                for d in data.__data[data.__root]:
                     if isinstance(d, dict):
                         out.add(value=d, existing_keys='combine')
-                data.load_object(out.__data__[data.__root__])
+                data.load_object(out.__data[data.__root])
                 data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                              pull_lists_from_pairs=True)
 
             return data.pairs(as_dictionaries=as_dictionaries)
 
         except (KeyPathError, AddError):
-            data.__raise_error__(KeyPathError('there was a problem while searching through the JSON data.'),
-                                 ignore_errors)
+            data.__raise_error(KeyPathError('there was a problem while searching through the JSON data.'),
+                               ignore_errors)
         except AttributeError:
             pass
 
@@ -676,24 +676,24 @@ class T4Json:
         try:
             data.load_object(deepcopy(self.read(path=path)))
 
-            if isinstance(data.__data__[data.__root__], dict):
+            if isinstance(data.__data[data.__root], dict):
                 data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                              pull_lists_from_pairs=search_lists)
-            elif isinstance(data.__data__[data.__root__], list):
+            elif isinstance(data.__data[data.__root], list):
                 data.flatten()
                 out: T4Json = T4Json()
-                for d in data.__data__[data.__root__]:
+                for d in data.__data[data.__root]:
                     if isinstance(d, dict):
                         out.add(value=d, existing_keys='combine')
-                data.load_object(out.__data__[data.__root__])
+                data.load_object(out.__data[data.__root])
                 data.flatten(flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                              pull_lists_from_pairs=search_lists)
 
             return data.read(path=key)
 
         except (KeyPathError, AddError):
-            data.__raise_error__(KeyPathError(f'The key "{key}" could not be found.'),
-                                 ignore_errors)
+            data.__raise_error(KeyPathError(f'The key "{key}" could not be found.'),
+                               ignore_errors)
         except AttributeError:
             pass
 
@@ -708,7 +708,7 @@ class T4Json:
         if only_ascii is None:
             only_ascii: bool = self.only_ascii
         if separators is None:
-            separators: tuple = self.__json_separators__
+            separators: tuple = self.__json_separators
         return json.dumps(self.read(path=path, ignore_errors=ignore_errors), skipkeys=True, indent=indent,
                           sort_keys=sort_keys, ensure_ascii=only_ascii, separators=separators)
 
@@ -716,12 +716,12 @@ class T4Json:
         """Sets the working level within a nested data structure."""
 
         if self.is_path_relative(path):
-            path: str = self.__interpret_path__(path, return_as_str=True)
+            path: str = self.__interpret_path(path, return_as_str=True)
 
         if isinstance(self.read(path=path, ignore_errors=ignore_errors), (dict, list)):
-            self.__working_level__: str = path
+            self.__working_level: str = path
         else:
-            self.__working_level__: str = self.__path_separator__.join(path.split(self.__path_separator__)[:-1])
+            self.__working_level: str = self.__path_separator.join(path.split(self.__path_separator)[:-1])
 
         return self
 
@@ -750,11 +750,11 @@ class T4Json:
 
         # parameter setup
         if separator is None:
-            separator: str = self.__path_separator__
+            separator: str = self.__path_separator
         if relative is None:
-            relative: str = self.__relative_path_command__
+            relative: str = self.__relative_path_command
         if relative_back is None:
-            relative_back: str = self.__relative_back_path_command__
+            relative_back: str = self.__relative_back_path_command
 
         # main
         def is_common_element_in_str(a, b) -> bool:
@@ -775,8 +775,8 @@ class T4Json:
         elif is_common_element_in_str(separator, relative_back):
             raise ArgumentError('Argument <relative_back> and <separator> cannot have any character in common.')
         else:
-            self.__working_level__: str = self.__working_level__.replace(self.__path_separator__, separator)  # incase working path already exist
-            self.__path_separator__: str = separator
+            self.__working_level: str = self.__working_level.replace(self.__path_separator, separator)  # incase working path already exist
+            self.__path_separator: str = separator
 
         return self
 
@@ -785,21 +785,21 @@ class T4Json:
         The most compact arguments would be ("," and ":") instead of the default (", " and ": ")."""
 
         if item_separator is None:
-            item_separator: str = self.__json_separators__[0]
+            item_separator: str = self.__json_separators[0]
         if key_value_separator is None:
-            key_value_separator: str = self.__json_separators__[1]
+            key_value_separator: str = self.__json_separators[1]
 
-        self.__json_separators__: tuple = (item_separator, key_value_separator)
+        self.__json_separators: tuple = (item_separator, key_value_separator)
         return self
 
     def set_known_objects_for_path(self, objects: list = None) -> 'T4Json':
         """Updates the known objects that path uses to navigate data - (and uses these objects as keys)."""
         if objects is None:
-            self.__known_objects_for_path__: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
+            self.__known_objects_for_path: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
                                                      'list': list, 'tuple': tuple, 'frozenset': frozenset,
                                                      'set': set, 'dict': dict, 'str': str, 'object': object, }
         for o in objects:
-            self.__known_objects_for_path__.update({o.__name__: o})
+            self.__known_objects_for_path.update({o.__name__: o})
         return self
 
     def is_sorting_keys(self) -> bool:
@@ -816,7 +816,7 @@ class T4Json:
 
     def get_working_level(self) -> str:
         """Returns the current working level as a path."""
-        return self.__working_level__
+        return self.__working_level
 
     def get_indentation(self) -> int or str or None:
         """Returns the indentation property. An int, str or None can be expected."""
@@ -824,11 +824,11 @@ class T4Json:
 
     def get_path_separator_properties(self) -> tuple:
         """Returns the current path separator properties."""
-        return self.__path_separator__, self.__relative_path_command__, self.__relative_back_path_command__
+        return self.__path_separator, self.__relative_path_command, self.__relative_back_path_command
 
     def get_known_objects_for_path(self) -> list:
         """Returns a list of the objects that have been made known."""
-        return list(self.__known_objects_for_path__.values())
+        return list(self.__known_objects_for_path.values())
 
     def reset_settings(self) -> None:
         """Resets any settings that have been changed... back to their original default values."""
@@ -842,18 +842,18 @@ class T4Json:
         self.set_known_objects_for_path()
 
         # off limit __vars__
-        self.__json_separators__: tuple = (', ', ': ')  # index 0 is for items and index 1 is for JSON objects
-        self.__path_separator__: str = '\\\\'
-        self.__relative_path_command__: str = ''
-        self.__relative_back_path_command__: str = '..'
-        self.__working_level__: str or None = None
+        self.__json_separators: tuple = (', ', ': ')  # index 0 is for items and index 1 is for JSON objects
+        self.__path_separator: str = '\\\\'
+        self.__relative_path_command: str = ''
+        self.__relative_back_path_command: str = '..'
+        self.__working_level: str or None = None
 
     def is_path_existent(self, path) -> bool:
         """Checks to see if *path* exist in the currently opened data structure. True is return if it
         does exist... and False otherwise."""
 
         try:
-            self.__walk_path__(path, ignore_path_errors=False)
+            self.__walk_path(path, ignore_path_errors=False)
             return True
         except KeyPathError:
             return False
@@ -864,9 +864,9 @@ class T4Json:
         if path == '':
             return False
         else:
-            if path in (self.__relative_path_command__, self.__relative_back_path_command__):
+            if path in (self.__relative_path_command, self.__relative_back_path_command):
                 return True
-            elif path.startswith(self.__relative_back_path_command__ + self.__path_separator__) or path.startswith(self.__relative_path_command__ + self.__path_separator__):
+            elif path.startswith(self.__relative_back_path_command + self.__path_separator) or path.startswith(self.__relative_path_command + self.__path_separator):
                 return True
             else:
                 return False
@@ -901,7 +901,7 @@ class T4Json:
                 else:
                     data: dict or list = json.load(file)
             self.close()
-            self.__data__: dict = {self.__root__: data}
+            self.__data: dict = {self.__root: data}
             return self
         except FileNotFoundError:
             if create:
@@ -923,12 +923,12 @@ class T4Json:
             if isinstance(string, bytes):
                 string: str = string.decode(encoding=encoding, errors=encoding_errors)
             if decode_html_entities:
-                data: dict or list = json.loads(self.__decode_html_entities__(string))
+                data: dict or list = json.loads(self.__decode_html_entities(string))
             else:
                 data: dict or list = json.loads(string)
 
             self.close()
-            self.__data__: dict = {self.__root__: data}  # deserialize JSON data into object type dict
+            self.__data: dict = {self.__root: data}  # deserialize JSON data into object type dict
             return self
         except Exception:
             raise LoadStringError
@@ -944,14 +944,14 @@ class T4Json:
 
             try:
                 if decode_html_entities:
-                    data: dict or list = json.loads(self.__decode_html_entities__(response.content.decode(encoding=encoding, errors=encoding_errors)))
+                    data: dict or list = json.loads(self.__decode_html_entities(response.content.decode(encoding=encoding, errors=encoding_errors)))
                 else:
                     data: dict or list = json.loads(response.content.decode(encoding=encoding, errors=encoding_errors))
             except Exception:
                 raise LoadURLError
 
             self.close()
-            self.__data__: dict = {self.__root__: data}
+            self.__data: dict = {self.__root: data}
             return self
         except Exception as e:
             raise LoadURLError(e.__str__())
@@ -959,14 +959,14 @@ class T4Json:
     def load_object(self, value: dict or list) -> 'T4Json':
         """Receives whatever is passed to *value* as the new JSON data to work with."""
 
-        self.__file_path__: str or None = None
+        self.__file_path: str or None = None
         return self.new(value)
 
     def save(self, indent: int or str = None, sort_keys: bool = None, only_ascii: bool = None, separators: tuple = None,
              encoding: str = 'utf-8', encoding_errors: str = 'strict') -> 'T4Json':
         """Saves the currently opened file if a file is opened."""
 
-        if self.__file_path__ is not None:
+        if self.__file_path is not None:
             if indent is None:
                 indent: int or str or None = self.indentation
             if sort_keys is None:
@@ -974,9 +974,9 @@ class T4Json:
             if only_ascii is None:
                 only_ascii: bool = self.only_ascii
             if separators is None:
-                separators: tuple = self.__json_separators__
-            with open(self.__file_path__, 'w', encoding=encoding, errors=encoding_errors) as file:
-                json.dump(obj=self.__data__[self.__root__], fp=file, skipkeys=True, indent=indent, sort_keys=sort_keys,
+                separators: tuple = self.__json_separators
+            with open(self.__file_path, 'w', encoding=encoding, errors=encoding_errors) as file:
+                json.dump(obj=self.__data[self.__root], fp=file, skipkeys=True, indent=indent, sort_keys=sort_keys,
                           ensure_ascii=only_ascii, separators=separators)
             return self
 
@@ -993,11 +993,11 @@ class T4Json:
         if only_ascii is None:
             only_ascii: bool = self.only_ascii
         if separators is None:
-            separators: tuple = self.__json_separators__
+            separators: tuple = self.__json_separators
 
         if not file_path_exists(file_path) or overwrite:
             with open(file_path, 'w', encoding=encoding, errors=encoding_errors) as file:
-                json.dump(obj=self.__data__[self.__root__], fp=file, skipkeys=True, indent=indent, sort_keys=sort_keys,
+                json.dump(obj=self.__data[self.__root], fp=file, skipkeys=True, indent=indent, sort_keys=sort_keys,
                           ensure_ascii=only_ascii, separators=separators)
         else:
             raise FileExistsError('<new_file> must not already exist.\nSet the <overwrite> argument to True so that'
@@ -1007,12 +1007,12 @@ class T4Json:
 
     def close(self) -> 'T4Json':
         """Simply closes the data that's already open and leaves you with an empty dictionary."""
-        self.__file_path__: str or None = None
+        self.__file_path: str or None = None
         return self.new({})
 
     @property
     def data(self) -> dict or list or str or float or int or bool or None:
-        return self.__data__[self.__root__]
+        return self.__data[self.__root]
 
     def pprint(self, path: str = '', indent: int = 1, print_to_console: bool = True, ignore_errors: bool = None) -> str:
         """Pretty Prints the currently opened data."""
@@ -1023,7 +1023,7 @@ class T4Json:
         return out
 
     @staticmethod
-    def __raise_error__(error: object, ignore: bool = False, from_none: bool = False) -> None:
+    def __raise_error(error: object, ignore: bool = False, from_none: bool = False) -> None:
         if not ignore:
             if from_none:
                 raise error from None
@@ -1031,66 +1031,66 @@ class T4Json:
                 raise error
 
     @staticmethod
-    def __decode_html_entities__(string: str) -> str:
+    def __decode_html_entities(string: str) -> str:
         from html import unescape as decode_html
         return decode_html(string.replace('&quot;', r'\"'))
 
-    def __interpret_path__(self, path: str, working_level: str = None, return_as_str: bool = False) -> list or str:
+    def __interpret_path(self, path: str, working_level: str = None, return_as_str: bool = False) -> list or str:
         """Receives a path as relative or absolute and then always returns the absolute version of the path as a list"""
         # parameter setup
         if working_level is None:
-            working_level: str = self.__working_level__
+            working_level: str = self.__working_level
         if path == '.':
             path: str = working_level
         elif path == '..':
-            path: str = working_level.rpartition(self.__path_separator__)[0]
+            path: str = working_level.rpartition(self.__path_separator)[0]
 
         # main
-        back: str = self.__relative_back_path_command__ + self.__path_separator__
-        working: str = self.__relative_path_command__ + self.__path_separator__
+        back: str = self.__relative_back_path_command + self.__path_separator
+        working: str = self.__relative_path_command + self.__path_separator
         if path.startswith(back):  # if going back
 
             left_count = 0
-            for b in path.split(self.__path_separator__):
-                if b == self.__relative_back_path_command__:
+            for b in path.split(self.__path_separator):
+                if b == self.__relative_back_path_command:
                     left_count += 1
                 else:
                     break
-            out: list = working_level.split(self.__path_separator__)[:-left_count] + path.split(self.__path_separator__)[left_count:]
+            out: list = working_level.split(self.__path_separator)[:-left_count] + path.split(self.__path_separator)[left_count:]
 
         elif path.startswith(working):  # if work at current working level
-            out: list = working_level.split(self.__path_separator__) + path.split(self.__path_separator__)[1:]
+            out: list = working_level.split(self.__path_separator) + path.split(self.__path_separator)[1:]
 
         else:  # if absolute path
 
             if return_as_str:
                 return path
-            out: list = path.split(self.__path_separator__)
+            out: list = path.split(self.__path_separator)
 
         if return_as_str:
-            return self.__path_separator__.join(out)
+            return self.__path_separator.join(out)
         else:
             return out
 
-    def __walk_path__(self, path: str, ignore_path_errors: bool = None) -> tuple:
+    def __walk_path(self, path: str, ignore_path_errors: bool = None) -> tuple:
         """return the parent container along with the key in a tuple to access its value - (container, key)."""
         # parameter setup
         if ignore_path_errors is None:
             ignore_path_errors: bool = self.ignore_method_errors
 
         if path == '' and not self.is_path_relative(path):
-            return self.__data__, self.__root__
+            return self.__data, self.__root
 
         # path setup
-        path_: list = self.__interpret_path__(path)
+        path_: list = self.__interpret_path(path)
         error_catcher_key: str = path
 
         # main
         try:
             if not path_[0] == '':
-                parent_of_target_level: dict or list = self.__data__[self.__root__]  # level iterator... used to assign each level as it walks down the data structure.
+                parent_of_target_level: dict or list = self.__data[self.__root]  # level iterator... used to assign each level as it walks down the data structure.
             else:
-                parent_of_target_level: dict = self.__data__  # level iterator... used to assign each level as it walks down the data structure.
+                parent_of_target_level: dict = self.__data  # level iterator... used to assign each level as it walks down the data structure.
 
             for key in path_[:-1]:  # loop through path all the way down to the parent of the target level
                 error_catcher_key: str = key  # if key does not exist this is used to catch the error
@@ -1098,7 +1098,7 @@ class T4Json:
                     try:
                         parent_of_target_level: dict or list = parent_of_target_level[key]
                     except KeyError:
-                        parent_of_target_level: dict or list = parent_of_target_level[self.__literal_eval__(key)]
+                        parent_of_target_level: dict or list = parent_of_target_level[self.__literal_eval(key)]
                 else:  # if parent of the target level is a list
                     parent_of_target_level: dict or list = parent_of_target_level[int(key)]
 
@@ -1112,7 +1112,7 @@ class T4Json:
                 try:  # since the target level is not checked in the for loop check it here
                     catch_invalid_path(target_level_key)
                 except KeyError:
-                    target_level_key: Any = self.__literal_eval__(target_level_key)
+                    target_level_key: Any = self.__literal_eval(target_level_key)
                     catch_invalid_path(target_level_key)
 
                 return parent_of_target_level, target_level_key
@@ -1121,17 +1121,17 @@ class T4Json:
                 return parent_of_target_level, int(target_level_key)
 
         except (KeyError, TypeError, SyntaxError):  # SyntaxError is caused by literal_eval()... like if "8f" is in path.
-            self.__raise_error__(KeyPathError(f'\n`{error_catcher_key}` is a non-existent key or an invalid index.'), ignore=ignore_path_errors)
+            self.__raise_error(KeyPathError(f'\n`{error_catcher_key}` is a non-existent key or an invalid index.'), ignore=ignore_path_errors)
             return {'error': f'`{error_catcher_key}` is a non-existent key or an invalid index.'}, 'error'
         except ValueError:
-            self.__raise_error__(KeyPathError(f'\n`{error_catcher_key}` is an invalid index.'),
-                                 ignore=ignore_path_errors)
+            self.__raise_error(KeyPathError(f'\n`{error_catcher_key}` is an invalid index.'),
+                               ignore=ignore_path_errors)
             return {'error': f'Index `{error_catcher_key}` is an invalid index.'}, 'error'
         except IndexError:
-            self.__raise_error__(KeyPathError(f'\nIndex `{error_catcher_key}` is out of range.'), ignore=ignore_path_errors)
+            self.__raise_error(KeyPathError(f'\nIndex `{error_catcher_key}` is out of range.'), ignore=ignore_path_errors)
             return {'error': f'Index `{error_catcher_key}` is out of range.'}, 'error'
 
-    def __literal_eval__(self, string: str) -> Any:
+    def __literal_eval(self, string: str) -> Any:
         # Basically Performs Lexical Analysis
         """
         Safely evaluate a python datatype from a string. The string may only consist of the following
@@ -1153,9 +1153,9 @@ class T4Json:
         if string.startswith("<class '") and string.endswith("'>"):
             # if <string> is the objects full name... then extract the name
             string: str = regex_findall('[a-zA-Z_]+', string)[-1]
-        if string in self.__known_objects_for_path__:
+        if string in self.__known_objects_for_path:
             # if there is a custom object... then it will be returned without any further processing
-            return self.__known_objects_for_path__[string]
+            return self.__known_objects_for_path[string]
 
         # Frozenset Object - prep (if needed) for Main:
         """Note:
