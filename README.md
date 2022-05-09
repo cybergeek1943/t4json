@@ -110,8 +110,8 @@ __Editing Methods__
 * ```copy_from_to()```
 * ```delete()```
 * ```delete_empty_containers()```
-* ```overwrite()```
-* ```wipe()```
+* ```new()```
+* ```clear()``` | ```wipe()```
 * ```format()```
 * ```flatten()```
 
@@ -140,12 +140,14 @@ __Settings Methods__
 * ```set_ignore_errors()```
 * ```set_path_separator_properties()```
 * ```set_json_separators()```
+* ```set_path_separator_properties()```
 * ```is_sorting_keys()```
 * ```is_only_ascii()```
 * ```is_ignoring_errors()```
 * ```get_working_level()```
 * ```get_indentation()```
 * ```get_path_separator_properties()```
+* ```get_known_objects_for_path()```
 * ```reset_settings()```
 
 &emsp;
@@ -155,15 +157,16 @@ __I/O Methods__
 * ```load_file()```
 * ```load_from_string()```
 * ```load_from_url()```
+* ```load_object()```
 * ```save()```
 * ```save_as()```
 * ```json_string()```
-* ```new()```
 * ```close()```
 
 &emsp;
 
 __Other/Misc Methods__
+* ```pprint()```
 * ```is_path_existent()```
 * ```is_path_relative()```
 
@@ -172,7 +175,8 @@ __Other/Misc Methods__
 ## T4Json Methods
 The ```self``` parameter is omitted in the proceeding documentation.
 
-Also, a parameter that is in most methods named ```ignore_errors``` has been omitted. What ```ignore_errors``` does is ignore non-critical errors such as the ```path``` or ```key``` being incorrect.
+Also, a parameter within most of the methods named ```ignore_errors``` has been omitted. What ```ignore_errors``` does is ignore non-critical errors such as the ```key```/```path``` to a value being incorrect.
+
 ___
 #### Editing Methods:
 ###### _T4Json._ ```add(value, path='', existing_keys='pass', create=False, index=None, integrate_list_with_list=False)```
@@ -483,6 +487,12 @@ ___item_separator___ is used to separate pairs or items. It is ", " by default.
 __pair_separator__ is used to separate key and values. It is ": " by default.
 
 
+&emsp;
+###### _T4Json._ ```set_known_objects_for_path(objects=None)```
+Sets the objects that will be recognized as keys within paths.
+
+___objects___ must be provided a list of objects to add to the known objects collection. If nothing is passed, and it is ```None```, then the known object collection will be reset to the default set of known objects.
+
 
 &emsp;
 ###### _T4Json._ ```is_sorting_keys()```
@@ -514,6 +524,10 @@ Returns the indentation property. An _Integer_, _String_ or _None_ can be expect
 Returns the path separator properties in a tuple - (path separator, relative command, relative_back command)
 
 &emsp;
+###### _T4Json._ ```get_known_objects_for_path()```
+Returns a list of the known objects that are recognized as keys within paths.
+
+&emsp;
 ###### _T4Json._ ```reset_settings()```
 Resets any settings that have been changed… back to their original default values.
 
@@ -524,9 +538,8 @@ Resets any settings that have been changed… back to their original default val
 ___
 
 #### I/O Methods:
-__Note__ - ( A few parameters have been left out in the documentation below. The first is ```encoding``` and ```encoding_errors```/```errors```. These parameters are part of the built-in open() function. Check out the open() functions [docs](https://docs.python.org/3/library/functions.html#open) for more information. In addition ```decode_html_entities``` has also been left out. ```decode_html_entities``` just decodes any HTML [entities](https://www.freeformatter.com/html-entities.html)... by default it is set to ```False```.
+__Note__ - ( A few parameters have been left out in the documentation below. The first is ```encoding``` and ```encoding_errors```/```errors```. These parameters are part of the built-in open() function. Check out the open() functions [docs](https://docs.python.org/3/library/functions.html#open) for more information. In addition ```decode_html_entities``` has also been left out. ```decode_html_entities``` just decodes any HTML [entities](https://www.freeformatter.com/html-entities.html)... by default it is set to ```False```.)
 
-The second set of parameters are ```url_parameters```/```params``` & ```url_headers```/```headers``` & ```url_user_auth```/```auth```. They are used to interact with APIs from a URL/Endpoint. There functionality comes from the "requests" package. If you are not familiar with the [request](https://docs.python-requests.org/en/latest/) package you may want to look into it before using these features. Check out the docs for the parameters ```params``` [here](https://docs.python-requests.org/en/latest/api/#requests.get) & [here](https://pythonexamples.org/python-requests-send-parameters-in-url/) ___and___ ```headers``` [here](https://docs.python-requests.org/en/latest/api/#requests.request) & [here](https://www.tutorialspoint.com/requests/requests_http_requests_headers.htm) ___and___ ```auth``` [here](https://docs.python-requests.org/en/latest/user/authentication). Here is another good [guide](https://www.nylas.com/blog/use-python-requests-module-rest-apis/) on working with APIs.)
 
 &emsp;
 
@@ -536,10 +549,22 @@ __Note__ - ( The ```__init__()``` for the T4Json class uses the same parameters 
 
 &emsp;
 
-###### _T4Json._ ```load(source, create=False)```
-This method loads the json data. It can receive a *File Path*, *URL*, or *JSON String*.
+###### _T4Json._ ```load(source, url_parameters=None, url_headers=None, url_body=None, url_user_auth=None, url_request_method='GET', url_raise_for_status=False, create=False)```
+This method loads the json data. It can receive a *File Path*, *URL*, *JSON String*, *dict*, or *list*.
 
-___source___ must be passed a string - File Path, URL, or JSON String.
+___source___ must be passed a string - File Path, URL/Endpoint, JSON String, Dict, or List.
+
+___url_parameters___ must be passed a __dict__, __list__, or __bytes__ that contains the parameters that will be combined with the URL. Check out this [guide](https://pythonexamples.org/python-requests-send-parameters-in-url/)
+
+___url_headers___ must be passed a __dict__ containing the HTTP headers. Check out this [guide](https://www.tutorialspoint.com/requests/requests_http_requests_headers.htm).
+
+___url_body___ must be passed a JSON serializable object (usually a __dict__) containing the HTTP body that will be sent when the request is made.
+
+___url_user_auth___ must be passed a __tuple__/__auth object__ used to authenticate a user using HTTP Basic/Digest/Custom Authentication or methods like OAuth. Check out the docs [here](https://docs.python-requests.org/en/latest/user/authentication).
+
+___url_request_method___ must be passed a __string__ such as "GET", "POST", "PUT" or "DELETE".
+
+___url_raise_for_status___ when set to ```True``` it will raise an error if response/status code is anything other than 200.
 
 ___create___ If you are attempting to load a file that does not exist and this parameter is set to ```True``` then the non-existent file will be created.
 
@@ -562,11 +587,24 @@ ___string___ must be passed a _String_ of serialized json data.
 
 
 &emsp;
-###### _T4Json._ ```load_from_url(url)```
-Loads json data from the specified URL.
+###### _T4Json._ ```load_from_url(url, parameters=None, headers=None, body=None, user_auth=None, request_method='GET', raise_for_status=False)```
+Loads json data from the specified URL/Endpoint.
 
-___url___ must be passed a URL that leads to the Json data you want to load from the internet.
+___url___ must be passed a URL/Endpoint that leads to the Json data you want to load.
 
+___parameters___ must be passed a __dict__, __list__, or __bytes__ that contains the parameters that will be combined with the URL. Check out this [guide](https://pythonexamples.org/python-requests-send-parameters-in-url/)
+
+___headers___ must be passed a __dict__ containing the HTTP headers. Check out this [guide](https://www.tutorialspoint.com/requests/requests_http_requests_headers.htm).
+
+___body___ must be passed a JSON serializable object (usually a __dict__) containing the HTTP body that will be sent when the request is made.
+
+___user_auth___ must be passed a __tuple__/__auth object__ used to authenticate a user using HTTP Basic/Digest/Custom Authentication or methods like OAuth. Check out the docs [here](https://docs.python-requests.org/en/latest/user/authentication).
+
+___request_method___ must be passed a __string__ such as "GET", "POST", "PUT" or "DELETE".
+
+___raise_for_status___ when set to ```True``` it will raise an error if response/status code is anything other than 200.
+
+This functionality comes from the "requests" package. If you are not familiar with the [request](https://docs.python-requests.org/en/latest/) package you may want to look into it before using these features. Here is a good [guide](https://www.nylas.com/blog/use-python-requests-module-rest-apis/) on working with APIs using the requests module.
 
 
 &emsp;
@@ -624,13 +662,24 @@ Receives whatever is passed to _value_ as the new json data to work with. This w
 ###### _T4Json._ ```close()```
 Simply closes the data that's already open and leaves you with an empty dictionary.
 
-
 &emsp;
 
 &emsp;
 ___
 
 #### Other/Misc Methods:
+
+###### _T4Json._ ```pprint(path='', indent=1, print_to_console=True)```
+Note - it is not necessary to call this method if you just want to only view the data. You can simply print the instance of the T4Json class you would like to view. 
+
+___path___ can lead to the level that you want to print.
+
+___indent___ must be passed an integer. This specifies the amount of indentation you would like.
+
+___print_to_console___ when set to ```True``` will print it to the console. If set to ```False```, this method will only return the string that was going to be printed.
+
+
+&emsp;
 ###### _T4Json._ ```is_path_existent(path)```
 Checks to see if ___path___ exist in the currently opened data structure. ```True``` is return if it does exist… and ```False``` otherwise.
 
