@@ -110,7 +110,7 @@ __Editing Methods__
 * ```delete()```
 * ```delete_empty_containers()```
 * ```new()```
-* ```clear()``` | ```wipe()```
+* ```clear()``` / ```wipe()```
 * ```format()```
 * ```flatten()```
 
