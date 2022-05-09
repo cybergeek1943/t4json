@@ -1153,6 +1153,8 @@ class T4Json:
         if string.startswith("<class '") and string.endswith("'>"):
             # if <string> is the objects full name... then extract the name
             string: str = regex_findall('[a-zA-Z_]+', string)[-1]
+        elif string.startswith('<function ') and string.endswith('>'):
+            string: str = string.split(' ')[1]
         if string in self.__known_objects_for_path:
             # if there is a custom object... then it will be returned without any further processing
             return self.__known_objects_for_path[string]
