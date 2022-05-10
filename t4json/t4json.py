@@ -183,7 +183,7 @@ class T4Json:
                 if new_key not in data[0]:
                     data[0][new_key] = data[0].pop(data[1])  # replaces key in dict with new key while keeping the value
 
-                    if self.__working_level.startswith(path):  # TODO: test this
+                    if self.__working_level.startswith(path):
                         new_working_level = self.__working_level.split(self.__path_separator)
                         new_working_level[len(path.split(self.__path_separator)) - 1] = new_key
                         self.set_working_level(path=self.__path_separator.join(new_working_level))
@@ -213,18 +213,18 @@ class T4Json:
                         self.delete(path)
                     elif existing_key == 'error':
                         self.__raise_error(ArgumentError('\n\n<new_key> is already being used on this level.'
-                                                           '\n\nSet the <existing_key> argument to "combine" so that '
-                                                           'the values will be combined into a list.\nSet the '
-                                                           '<existing_key> argument to "integrate" so that the values '
-                                                           'will be integrated with each other.\nSet the '
-                                                           '<existing_key> argument to "replace" so that that the '
-                                                           'key that already exists will have its value be replaced.'
-                                                           '\nSet the <existing_key> argument to "pass" so that that '
-                                                           'the key that already exists will have its value be '
-                                                           'replaced by the key being renamed.'), ignore_errors)
+                                                         '\n\nSet the <existing_key> argument to "combine" so that '
+                                                         'the values will be combined into a list.\nSet the '
+                                                         '<existing_key> argument to "integrate" so that the values '
+                                                         'will be integrated with each other.\nSet the '
+                                                         '<existing_key> argument to "replace" so that that the '
+                                                         'key that already exists will have its value be replaced.'
+                                                         '\nSet the <existing_key> argument to "pass" so that that '
+                                                         'the key that already exists will have its value be '
+                                                         'replaced by the key being renamed.'), ignore_errors)
                     else:
                         self.__raise_error(ArgumentError('<existing_pair> argument must be equal to "combine", '
-                                                           '"integrate", "replace", "pass" or "error".'), ignore_errors)
+                                                         '"integrate", "replace", "pass" or "error".'), ignore_errors)
 
             return self
         except (IndexError, TypeError):
@@ -659,7 +659,7 @@ class T4Json:
         except AttributeError:
             pass
 
-    def search(self, key: str, path: str = '', search_lists: bool = False,
+    def search(self, key: str, path: str = '', search_lists: bool = True,
                ignore_errors: bool = None) -> list or str or int or float or bool or None:
         """Searches through all the JSON data or (past a certain point specified by *path*) for *key*. If there are
         multiple keys with the same name spread throughout the data, a list of their all there values will be returned.
@@ -796,8 +796,8 @@ class T4Json:
         """Updates the known objects that path uses to navigate data - (and uses these objects as keys)."""
         if objects is None:
             self.__known_objects_for_path: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
-                                                     'list': list, 'tuple': tuple, 'frozenset': frozenset,
-                                                     'set': set, 'dict': dict, 'str': str, 'object': object, }
+                                                   'list': list, 'tuple': tuple, 'frozenset': frozenset,
+                                                   'set': set, 'dict': dict, 'str': str, 'object': object, }
         for o in objects:
             self.__known_objects_for_path.update({o.__name__: o})
         return self
