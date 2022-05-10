@@ -954,7 +954,12 @@ class T4Json:
             self.__data: dict = {self.__root: data}
             return self
         except Exception as e:
-            raise LoadURLError(e.__str__())
+            try:
+                raise LoadURLError(
+                    f'{response}\n\nResponse/Returned Value:\n{response.content.decode(encoding=encoding, errors="ignore")}\n\nError Message:{e.__str__()}')
+            except UnboundLocalError:  # incase the URL is invalid and <response> never gets created
+                raise LoadURLError(
+                    f'\n{e.__str__()}\n\nError Message:\n<url> is likely invalid and/or does not exist.')
 
     def load_object(self, value: dict or list) -> 'T4Json':
         """Receives whatever is passed to *value* as the new JSON data to work with."""
