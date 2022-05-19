@@ -23,7 +23,7 @@ class T4Json:
                  url_headers: dict = None, url_body: Any = None, url_user_auth: Any = None,
                  url_request_method: str = 'GET', url_raise_for_status: bool = False, create: bool = False,
                  encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False):
-        self.__file_path: str or None = None  # used throughout the class to open, write and read to JSON files
+        self.__file_path: str or None = None  # used to save the currently opened file if one is open.
 
         # user_settings
         self.ignore_method_errors: bool = False
@@ -900,7 +900,8 @@ class T4Json:
                     self.load_from_string(string=file.read(), decode_html_entities=decode_html_entities)
                 else:
                     data: dict or list = json.load(file)
-            self.close()
+            self.__file_path: str = file_path
+            self.new({})  # closes the current data
             self.__data: dict = {self.__root: data}
             return self
         except FileNotFoundError:
