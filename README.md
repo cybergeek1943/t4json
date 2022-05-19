@@ -220,13 +220,6 @@ Look at the original json data from the [URL](https://mdn.github.io/learning-are
 
 ___
 
-## Roadmap
-* Develop a better algorithm for searching through nested data.
-* Refine Error Handling
-* Improve docstrings
-
-___
-
 ## Dependencies
 The only third party dependency is the "request" module.
 
