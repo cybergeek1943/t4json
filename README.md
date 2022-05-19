@@ -232,6 +232,26 @@ The only third party dependency is the "request" module.
 
 ___
 
+## Change Log - Latest Fixes & Improvements in v1.3.3
+* Greatly improved the error messages.
+* Fixed ___t4json___.```save()``` method.
+* Improved ___t4json___.```load()```&```load_file()```&```load_from_url()```&```load_from_string()```
+* Added ___t4json___.```load_object()``` for loading python objects.
+* Added new parameters to ___t4json___.```load_from_url()``` for making ```POST``` (and others) requests. Also added support for headers and body.
+* Improved walking up levels in nested data using paths.
+* Improved support for key paths to work with non-string objects that are keys.
+* Cleaned up code in general.
+
+___
+
+## Roadmap
+* Build better search algorithms.
+* Improve Documentation & move it to a better/more-organized website.
+* Make even more improvements on error messages.
+* Improve the __docstrings__
+
+___
+
 ## License
 
 __MIT__
