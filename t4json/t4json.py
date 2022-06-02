@@ -8,6 +8,7 @@
 #        _______\/\\\_______\///////////\\\//___/\\\___\/\\\_____\////////\\\_\//\\\__/\\\__\/\\\___\/\\\_
 #         _______\/\\\_________________\/\\\____\//\\\\\\\\\_______/\\\\\\\\\\__\///\\\\\/___\/\\\___\/\\\_
 #          _______\///__________________\///______\/////////_______\//////////_____\/////_____\///____\///__
+"""Check out the docs here: https://cybergeek1943.github.io/t4json/"""
 import json
 from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth, HTTPProxyAuth
 from typing import Any, KeysView

@@ -32,6 +32,8 @@ Using pip:
 
 Or just download the code from [GitHub](https://github.com/cybergeek1943/t4json) and use as a local module within your project… which may be more useful if you want to make changes to it.
 
+Try to keep this package up to date... this project is under active development and with every update there can be much more improvement on the previous version.
+
 &emsp;
 
 ### Notes
@@ -926,7 +928,20 @@ The only third party dependency is the "request" module.
 
 ___
 
-## Change Log - Latest Fixes & Improvements in v1.3.3
+## Change Log - Latest Fixes & Improvements
+
+### v1.4.0
+* Slicing Operations now supported on T4Json instances.
+* Support for adding and subtracting items or pairs to/from T4Json instances.
+* Support for iterating through a T4Json instance.
+* Support for getting the length of a T4Json instance - (number of all the pairs/items on the first level).
+* Support for checking equality (of data) between two T4Json instances.
+* Support for checking in-equality (number of all the pairs/items on the first level) between two T4Json instances.
+* Default support for printing a T4Json instance.
+* Adding a pretty print method.
+* Cleaned up code.
+
+### v1.3.3
 * Greatly improved the error messages.
 * Fixed ___t4json___.```save()``` method.
 * Improved ___t4json___.```load()```&```load_file()```&```load_from_url()```&```load_from_string()```
