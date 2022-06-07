@@ -229,7 +229,7 @@ The only third party dependency is the "request" module.
 
 ___
 
-## Change Log - Latest Fixes & Improvements
+## Change Log - Latest major Fixes & Improvements
 
 ### v1.4.0
 * Slicing Operations now supported on T4Json instances.

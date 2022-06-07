@@ -930,6 +930,10 @@ ___
 
 ## Change Log - Latest Fixes & Improvements
 
+### v1.4.1
+* Added support for re-calling T4Json instances to load new data.
+* Changed the ```chain_key``` parameter to ```chain_keys``` within the ```flatten()``` method.
+
 ### v1.4.0
 * Slicing Operations now supported on T4Json instances.
 * Support for adding and subtracting items or pairs to/from T4Json instances.
