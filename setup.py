@@ -6,7 +6,7 @@ with open('README.md', 'r', encoding='utf-8') as rm:
 setup(
     name='t4json',
     packages=['t4json'],
-    version='v1.4.0',
+    version='v1.4.1',
     license='MIT',
     install_requires=['requests'],
     description='Tools to work with JSON data easily and quickly.',
@@ -15,7 +15,7 @@ setup(
     author='Isaac Wolford',
     author_email='cybergeek.1943@gmail.com',
     url='https://cybergeek1943.github.io/t4json/',
-    download_url='https://github.com/cybergeek1943/t4json/archive/refs/tags/v1.4.0.tar.gz',
+    download_url='https://github.com/cybergeek1943/t4json/archive/refs/tags/v1.4.1.tar.gz',
     keywords=['json', 'tool', 'tools', 'data', 'structures', 'flattening', 't4json', 'flatten', 'nested'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

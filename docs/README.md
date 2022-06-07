@@ -297,7 +297,7 @@ ___only_ascii___ will escape any non-ASCII characters.
 
 
 &emsp;
-###### _T4Json._ ```flatten(path='', chain_key=False, chain_key_separator='_', flatten_opposite_container_type=True, pull_pairs_from_lists=True, pull_lists_from_pairs=False, existing_keys='integrate', list_index=None, delete_empty_containers=True)```
+###### _T4Json._ ```flatten(path='', chain_keys=False, chain_key_separator='_', flatten_opposite_container_type=True, pull_pairs_from_lists=True, pull_lists_from_pairs=False, existing_keys='integrate', list_index=None, delete_empty_containers=True)```
 This method flattens nested data.
 
 ___path___ can be used to select which level you want to flatten.

@@ -52,6 +52,15 @@ class T4Json:
                       url_user_auth=url_user_auth, create=create, encoding=encoding, encoding_errors=encoding_errors,
                       decode_html_entities=decode_html_entities)
 
+    def __call__(self, source: str | bytes | dict | list = None, url_parameters: dict | list | bytes = None,
+                 url_headers: dict = None, url_body: Any = None, url_user_auth: Any = None,
+                 url_request_method: str = 'GET', url_raise_for_status: bool = True, create: bool = False,
+                 encoding: str = 'utf-8', encoding_errors: str = 'ignore', decode_html_entities: bool = False) -> None:
+        self.load(source=source, url_parameters=url_parameters, url_headers=url_headers, url_body=url_body,
+                  url_request_method=url_request_method, url_raise_for_status=url_raise_for_status,
+                  url_user_auth=url_user_auth, create=create, encoding=encoding, encoding_errors=encoding_errors,
+                  decode_html_entities=decode_html_entities)
+
     def __str__(self) -> str:
         return self.pprint(print_to_console=False)
 
@@ -545,7 +554,7 @@ class T4Json:
         self.set_only_ascii(only_ascii)
         return self
 
-    def flatten(self, path: str = '', chain_key: bool = False, chain_include_index: bool = False,
+    def flatten(self, path: str = '', chain_keys: bool = False, chain_include_index: bool = False,
                 chain_key_separator: str = '_', flatten_opposite_container_type: bool = True,
                 pull_pairs_from_lists: bool = True, pull_lists_from_pairs: bool = False,
                 existing_keys: str = 'integrate', list_index: int | str | None = None,
@@ -555,7 +564,7 @@ class T4Json:
         # parameter setup
         if ignore_errors is None:
             ignore_errors: bool = self.ignore_method_errors
-        if chain_key and chain_key_separator == self.__path_separator:
+        if chain_keys and chain_key_separator == self.__path_separator:
             self.__raise_error(ArgumentError(
                 f'The argument <chained_keys_separator> cannot be the same as the current path separator: "{self.__path_separator}".'),
                                  ignore=ignore_errors)
@@ -571,7 +580,7 @@ class T4Json:
                 for key in container:
                     if isinstance(container[key], dict):
 
-                        if chain_key:
+                        if chain_keys:
                             for key_ in list(container[key]):
                                 self.change_key(
                                     path=f'{path}{self.__path_separator}{key}{self.__path_separator}{key_}',
@@ -598,7 +607,7 @@ class T4Json:
                                 return
                             elif pull_pairs_from_lists and isinstance(container[key][index], dict):
 
-                                if chain_key:
+                                if chain_keys:
                                     if chain_include_index:
                                         for key_ in list(container[key][index]):
                                             self.change_key(
@@ -639,7 +648,7 @@ class T4Json:
             if flatten_opposite_container_type:
                 for i, v in enumerate(container):
                     if isinstance(v, dict):
-                        self.flatten(path=f'{path}{self.__path_separator}{i}', chain_key=chain_key,
+                        self.flatten(path=f'{path}{self.__path_separator}{i}', chain_keys=chain_keys,
                                      chain_key_separator=chain_key_separator,
                                      flatten_opposite_container_type=flatten_opposite_container_type,
                                      pull_pairs_from_lists=pull_pairs_from_lists,
@@ -740,7 +749,7 @@ class T4Json:
                 else:
                     current_path_separator: str = data.__path_separator
                     data.set_path_separator_properties(separator=r'_sep-\\//-sep_')
-                    data.flatten(chain_key=as_paths, chain_include_index=True,
+                    data.flatten(chain_keys=as_paths, chain_include_index=True,
                                  chain_key_separator=current_path_separator,
                                  flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
@@ -757,7 +766,7 @@ class T4Json:
                 else:
                     current_path_separator: str = data.__path_separator
                     data.set_path_separator_properties(separator=r'_sep-\\//-sep_')
-                    data.flatten(chain_key=as_paths, chain_include_index=True,
+                    data.flatten(chain_keys=as_paths, chain_include_index=True,
                                  chain_key_separator=current_path_separator,
                                  flatten_opposite_container_type=search_lists, pull_pairs_from_lists=search_lists,
                                  pull_lists_from_pairs=True)
