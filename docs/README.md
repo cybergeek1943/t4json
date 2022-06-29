@@ -37,6 +37,7 @@ Try to keep this package up to date... this project is under active development 
 &emsp;
 
 ### Notes
+- Since v1.4.0, slicing operations are supported on T4Json instances. They can be used to delete, change and read values. Paths may also be used in the first slice to walk up a level. &emsp; Also, inplace/non-inplace adding and subtracting are supported for adding new items/pairs or removing items/pairs in bunches. &emsp; Iterating through T4Json instances is also now supported.
 - All methods (where applicable) within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy… or you can use the copy module to make a deep copy. You can access the deserialized data through the ```data``` property of the T4Json class.
 - Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data…
 
@@ -111,6 +112,7 @@ __Editing Methods__
 * ```copy_from_to()```
 * ```delete()```
 * ```delete_empty_containers()```
+* ```convert_singular_lists()```
 * ```new()```
 * ```clear()``` / ```wipe()```
 * ```format()```
@@ -167,9 +169,11 @@ __I/O Methods__
 &emsp;
 
 __Other/Misc Methods__
+* ```types()```
 * ```pprint()```
 * ```is_path_existent()```
 * ```is_path_relative()```
+* ```is_path()```
 
 &emsp;
 
@@ -267,6 +271,13 @@ ___path___ should lead to the pair/item you want to delete.
 
 
 &emsp;
+###### _T4Json._ ```convert_singular_lists(path)```
+Converts all values on the current level that are lists containing only one item to the item that is inside that list.
+
+___path___ should lead to the level in which you want to convert any singular lists to their one value.
+
+
+&emsp;
 ###### _T4Json._ ```delete_empty_containers(path)```
 This method can be used to delete any keys with empty containers as _values_.
 
@@ -297,7 +308,7 @@ ___only_ascii___ will escape any non-ASCII characters.
 
 
 &emsp;
-###### _T4Json._ ```flatten(path='', chain_keys=False, chain_key_separator='_', flatten_opposite_container_type=True, pull_pairs_from_lists=True, pull_lists_from_pairs=False, existing_keys='integrate', list_index=None, delete_empty_containers=True)```
+###### _T4Json._ ```flatten(path='', chain_keys=False, chain_key_separator='_', flatten_opposite_container_type=True, pull_pairs_from_lists=True, pull_lists_from_pairs=False, existing_keys='integrate', list_index=None, convert_singular_lists=True, delete_empty_containers=True)```
 This method flattens nested data.
 
 ___path___ can be used to select which level you want to flatten.
@@ -319,6 +330,8 @@ If set to "__combine__" then any key/s that already exist on the base level will
 If set to "__integrate__" then any key/s that already exist on the base level will have its value be integrated as best as possible with the value of the new key/s. If both the new and existing key/s have values that are containers… they will be integrated into ___one___ container.
 
 ___list_index___ when a _list_ is being flattened any nested contents will be pulled to the specified index. A string can also be passed to indicate where to place the _value_. It can be "center" (or "half"), "4q", "3q", "2q", "1q" or "0q" (The "q" stands for quarters)… or it can be a positive integer in a string that represents a proportional percentage/scale of where to place the _value_… with "0" being at the start and "100" being the end. When ```None``` is passed, the _value_ will be placed at the end of the list. If a nested _list_ is being flattened, and you want the contents to keep their positions than pass "hold".
+
+___convert_singular_lists___ - When the flatting has finished, if this is set to ```True```, then any values that are lists and only contain one item will be converted to the item that is contained within themselves. This does the same thing as the ```convert_singular_lists()``` method.
 
 ___delete_empty_containers___ - Once the flatting is all done and dusted and if this is set to ```True``` then any keys with empty containers as values will be deleted.
 
@@ -669,6 +682,23 @@ ___
 
 #### Other/Misc Methods:
 
+
+###### _T4Json._ ```types(path='')```
+Returns a __set__ of all the types on the current level (as defined by ***path***). If the current level is a dictionary than the types of all the values will be in the returned __set__.
+
+It can be used to check if a specific data type is on the current level. For example:
+```python
+>>> instance = T4Json([16, 'abc', 3.14])
+>>> int in instance
+True
+>>> str in instance
+True
+>>> tuple in instance
+False
+```
+
+
+&emsp;
 ###### _T4Json._ ```pprint(path='', indent=1, print_to_console=True)```
 Note - it is not necessary to call this method if you just want to only view the data. You can simply print the instance of the T4Json class you would like to view. 
 
@@ -687,6 +717,11 @@ Checks to see if ___path___ exist in the currently opened data structure. ```Tru
 &emsp;
 ###### _T4Json._ ```is_path_relative(path)```
 Checks to see if ___path___ is a relative path. ```True``` is returned if it is… and ```False``` otherwise.
+
+
+&emsp;
+###### _T4Json._ ```is_path(path)```
+Checks to see if ___path___ is considered a path in the current T4Json instance.
 
 
 &emsp;
@@ -929,6 +964,14 @@ The only third party dependency is the "request" module.
 ___
 
 ## Change Log - Latest Fixes & Improvements
+
+### v1.4.2
+* Added ```types()``` method to T4Json instance.
+* Added ```convert_singular_lists()``` method.
+* Added **_convert_singular_lists_** parameter to ```flatten()``` method.
+* The ```flatten()``` method should generally be up to 15% faster.
+* The **_chain_key_include_index_** of the ```flatten()``` method was fixed/improved.
+* cleaned up code in internal methods.
 
 ### v1.4.1
 * Added support for re-calling T4Json instances to load new data.

@@ -5,7 +5,7 @@ The t4json module was created to make working with [JSON](https://www.json.org/j
 This module should work on any installation of python 3.6
 or later on any OS right out of the box.
 
-Check out the ___docs___ [here](https://www.json.org/json-en.html).
+Check out the ___docs___ [here](https://cybergeek1943.github.io/t4json/).
 
 __Outline:__
 - Open up json data from a file, URL/Endpoint, or string with the T4Json class.
@@ -230,6 +230,14 @@ The only third party dependency is the "request" module.
 ___
 
 ## Change Log - Latest major Fixes & Improvements
+
+### v1.4.2
+* Added ```types()``` method to T4Json instance.
+* Added ```convert_singular_lists()``` method.
+* Added **_convert_singular_lists_** parameter to ```flatten()``` method.
+* The ```flatten()``` method should generally be up to 15% faster.
+* The **_chain_key_include_index_** of the ```flatten()``` method was fixed/improved.
+* cleaned up code in internal methods.
 
 ### v1.4.0
 * Slicing Operations now supported on T4Json instances.
