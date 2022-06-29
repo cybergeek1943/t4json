@@ -971,7 +971,7 @@ ___
 * Added **_convert_singular_lists_** parameter to ```flatten()``` method.
 * The ```flatten()``` method should generally be up to 15% faster.
 * The **_chain_key_include_index_** of the ```flatten()``` method was fixed/improved.
-* cleaned up code in internal methods.
+* Cleaned up code in internal methods.
 
 ### v1.4.1
 * Added support for re-calling T4Json instances to load new data.
