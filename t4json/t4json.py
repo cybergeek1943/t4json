@@ -576,7 +576,7 @@ class T4Json:
                 chain_key_separator: str = '_', flatten_opposite_container_type: bool = True,
                 pull_pairs_from_lists: bool = True, pull_lists_from_pairs: bool = False,
                 existing_keys: str = 'integrate', list_index: int or str or None = None,
-                convert_singular_lists: bool = True, delete_empty_containers: bool = True,
+                convert_singular_lists: bool = False, delete_empty_containers: bool = False,
                 ignore_errors: bool = None) -> 'T4Json':
         """This method flattens nested data."""
 
@@ -688,7 +688,7 @@ class T4Json:
                                      flatten_opposite_container_type=flatten_opposite_container_type,
                                      pull_pairs_from_lists=pull_pairs_from_lists,
                                      existing_keys=existing_keys, list_index=list_index,
-                                     delete_empty_containers=False)
+                                     convert_singular_lists=False, delete_empty_containers=False)
                 if pull_lists_from_pairs:
                     def recursive_func() -> None:
                         for index, value in enumerate(container):
