@@ -11,8 +11,9 @@
 """Check out the docs here: https://cybergeek1943.github.io/t4json/"""
 import json
 from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth, HTTPProxyAuth
-from typing import Any, KeysView
+from typing import Any, KeysView, Collection
 from copy import deepcopy, copy
+from itertools import zip_longest
 
 
 class T4Json:
@@ -346,7 +347,7 @@ class T4Json:
                 if new_key not in data[0]:
                     data[0][new_key] = data[0].pop(data[1])  # replaces key in dict with new key while keeping the value
 
-                    if self.__working_level.startswith(path):
+                    if self.__working_level.startswith(path):  # TODO: test this
                         new_working_level = self.__working_level.split(self.__path_separator)
                         new_working_level[len(path.split(self.__path_separator)) - 1] = new_key
                         self.set_working_level(path=self.__path_separator.join(new_working_level))
@@ -598,7 +599,6 @@ class T4Json:
             def recursive_func() -> None:
                 for key in container:
                     if isinstance(container[key], dict):
-
                         for key_ in list(container):  # takes a step back and processes all dicts
                             if isinstance(container[key_], dict):
                                 if chain_keys:
@@ -609,14 +609,12 @@ class T4Json:
 
                                 self.move_from_to(f'{path}{self.__path_separator}{key_}', to_path=path,
                                                   only_contents=True, existing_keys=existing_keys, index=list_index)
-
                         recursive_func()
                         return  # to break out of nested for loop
-
                     elif flatten_opposite_container_type and isinstance(container[key], list):
                         for item in container[key]:
                             if isinstance(item, list):
-                                for index, item_ in enumerate(container[key]):  # take a step back to process
+                                for index, item_ in enumerate(container[key]):  # takes a step back to process
                                     if isinstance(item_, list):
                                         if list_index == 'hold':
                                             self.move_from_to(
@@ -632,7 +630,6 @@ class T4Json:
                                 recursive_func()
                                 return  # to break out of nested for loop
                             elif pull_pairs_from_lists and isinstance(item, dict):
-
                                 if chain_keys:
                                     for index_, item_ in enumerate(container[key]):
                                         if isinstance(item_, dict):
@@ -648,7 +645,6 @@ class T4Json:
                                                         path=f'{path}{self.__path_separator}{key}{self.__path_separator}{index_}{self.__path_separator}{key_}',
                                                         new_key=f'{key}{chain_key_separator}{index_}{chain_key_separator}{key_}',
                                                         existing_key='integrate')
-
                                 index_holder: int = 0
                                 for index_ in range(container[key].__len__()):
                                     if isinstance(container[key][index_ - index_holder], dict):
@@ -657,10 +653,8 @@ class T4Json:
                                             to_path=path, only_contents=True, existing_keys=existing_keys,
                                             index=list_index)
                                         index_holder += 1
-
                                 recursive_func()
                                 return  # to break out of nested loop
-
             recursive_func()
         elif isinstance(container, list):
             def recursive_func() -> None:
@@ -1016,8 +1010,8 @@ class T4Json:
         """Updates the known objects that path uses to navigate data - (and uses these objects as keys)."""
         if objects is None:
             self.__known_objects_for_path: dict = {'bool': bool, 'int': int, 'float': float, 'complex': complex,
-                                                     'list': list, 'tuple': tuple, 'frozenset': frozenset,
-                                                     'set': set, 'dict': dict, 'str': str, 'object': object, }
+                                                   'list': list, 'tuple': tuple, 'frozenset': frozenset,
+                                                   'set': set, 'dict': dict, 'str': str, 'object': object, }
         for o in objects:
             self.__known_objects_for_path.update({o.__name__: o})
         return self
@@ -1100,6 +1094,14 @@ class T4Json:
             return True
         else:
             return False
+
+    def multi_iter(self, var_count: int = 2, step: int = None, start_index: int = 0, stop_index: int = None,
+                   include_uneven: bool = False, uneven_placeholder: Any = None, path: str = '',
+                   ignore_errors: bool or None = None) -> zip or zip_longest or iter:
+        """This allows looping multiple variables through the data in FOR loops."""
+        return multi_iter(self.read(path=path, ignore_errors=ignore_errors), var_count=var_count,
+                          step=step, start_index=start_index, stop_index=stop_index,
+                          include_uneven=include_uneven, uneven_placeholder=uneven_placeholder)
 
     def types(self, path: str = '', ignore_errors: bool = None) -> set:
         """Returns a set of all the types on the current level (as defined by *path*)"""
@@ -1485,6 +1487,72 @@ class T4Json:
         return path.rpartition(self.__path_separator)[0], path.rpartition(self.__path_separator)[-1]
 
 
+# Global Functions
+def multi_iter(data: list or tuple or dict or str or set or frozenset or T4Json, var_count: int = 2, step: int = None,
+               start_index: int = 0, stop_index: int = None, include_uneven: bool = False,
+               uneven_placeholder: Any = None) -> zip or zip_longest or iter:
+    """This allows looping multiple variables through `data` in FOR loops."""
+    # parameter setup
+    if isinstance(data, T4Json):
+        data: dict or list = data.read()
+    if isinstance(data, (dict, str, set, frozenset)):
+        data: tuple = tuple(data)
+    if start_index != 0 or stop_index is not None:
+        data: list or tuple = data[start_index:stop_index]
+
+    # main
+    if step is None or var_count == step:
+        if include_uneven and len(data) % var_count != 0:
+            return zip_longest(*(data[start::var_count] for start in range(var_count)), fillvalue=uneven_placeholder)
+        else:
+            return zip(*(data[start::var_count] for start in range(var_count)))
+    else:
+        data: list = [tuple(data[index:index + var_count]) for index in range(0, len(data), step)]
+        if include_uneven and step != 1:
+            for index, tuple_ in enumerate(data[::-1]):
+                if len(tuple_) != var_count:
+                    data[-(index + 1)] = (*tuple_, *[uneven_placeholder for _ in range(var_count - len(tuple_))])
+                else:
+                    break
+        else:
+            while len(data[-1]) != var_count:
+                data.pop(-1)
+        return iter(data)
+
+
+def is_valid_json_data(source: str) -> bool:
+    """This function returns ```True``` if the JSON data is valid. Otherwise, it returns ```False```."""
+
+    try:
+        T4Json(source=source)
+        return True
+    except LoadError:
+        return False
+
+
+def convert_to_valid_json_ready_data(
+        value: dict or list or tuple or str or float or int or bool or None) -> dict or list or str or float or int or bool or None:
+    """Converts *value* into JSON ready data. It will remove any unsupported keys and convert the keys that are not string into strings."""
+
+    if isinstance(value, (dict, list, tuple)):
+        return json.loads(json.dumps(obj=value, skipkeys=True))
+    else:
+        return value
+
+
+def deserialize_from_string(string: str) -> dict or list or str or int or float or bool or None:
+    """Loads JSON data from a *string* and returns the python data structure."""
+    return json.loads(string)
+
+
+def serialize_to_string(value: dict or list or str or int or float or bool or None, indent: None or int or str = None,
+                        sort_keys: bool = False, only_ascii: bool = False, separators: tuple = (', ', ': ')) -> str:
+    """Returns a JSON formatted string from *value*. This string can then... for example be saved to a file."""
+    return json.dumps(value, skipkeys=True, ensure_ascii=only_ascii, sort_keys=sort_keys, indent=indent,
+                      separators=separators)
+
+
+# Errors
 class LoadFileError(Exception):
     pass
 
@@ -1527,35 +1595,3 @@ class AddError(Exception):
 
 class ArgumentError(Exception):  # maybe replace this for the default TypeError
     pass
-
-
-def is_valid_json_data(source: str) -> bool:
-    """This function returns ```True``` if the JSON data is valid. Otherwise, it returns ```False```."""
-
-    try:
-        T4Json(source=source)
-        return True
-    except LoadError:
-        return False
-
-
-def convert_to_valid_json_ready_data(
-        value: dict or list or tuple or str or float or int or bool or None) -> dict or list or str or float or int or bool or None:
-    """Converts *value* into JSON ready data. It will remove any unsupported keys and convert the keys that are not string into strings."""
-
-    if isinstance(value, (dict, list, tuple)):
-        return json.loads(json.dumps(obj=value, skipkeys=True))
-    else:
-        return value
-
-
-def deserialize_from_string(string: str) -> dict or list or str or int or float or bool or None:
-    """Loads JSON data from a *string* and returns the python data structure."""
-    return json.loads(string)
-
-
-def serialize_to_string(value: dict or list or str or int or float or bool or None, indent: None or int or str = None,
-                        sort_keys: bool = False, only_ascii: bool = False, separators: tuple = (', ', ': ')) -> str:
-    """Returns a JSON formatted string from *value*. This string can then... for example be saved to a file."""
-    return json.dumps(value, skipkeys=True, ensure_ascii=only_ascii, sort_keys=sort_keys, indent=indent,
-                      separators=separators)
