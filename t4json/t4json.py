@@ -712,11 +712,12 @@ class T4Json:
 
     def multi_iter(self, var_count: int = 2, step: int = None, start_index: int = 0, stop_index: int = None,
                    include_uneven: bool = False, uneven_placeholder: Any = None, path: str = '',
-                   ignore_errors: bool or None = None) -> zip or zip_longest or iter:
+                   read_values_from_keys: bool = False, ignore_errors: bool or None = None) -> zip or zip_longest or iter:
         """This allows looping multiple variables through the data in FOR loops."""
         return multi_iter(self.read(path=path, ignore_errors=ignore_errors), var_count=var_count,
                           step=step, start_index=start_index, stop_index=stop_index,
-                          include_uneven=include_uneven, uneven_placeholder=uneven_placeholder)
+                          include_uneven=include_uneven, uneven_placeholder=uneven_placeholder,
+                          read_values_from_keys=read_values_from_keys)
 
     def pair(self, path: str, as_dictionary: bool = False, ignore_errors: bool = None) -> tuple or dict:
         """Returns a pair in the form of a tuple (<key>, <value>) or dictionary pair {<key>: <value>}
@@ -1490,13 +1491,18 @@ class T4Json:
 # Global Functions
 def multi_iter(data: list or tuple or dict or str or set or frozenset or T4Json, var_count: int = 2, step: int = None,
                start_index: int = 0, stop_index: int = None, include_uneven: bool = False,
-               uneven_placeholder: Any = None) -> zip or zip_longest or iter:
+               uneven_placeholder: Any = None, read_values_from_keys: bool = False) -> zip or zip_longest or iter:
     """This allows looping multiple variables through `data` in FOR loops."""
     # parameter setup
     if isinstance(data, T4Json):
         data: dict or list = data.read()
-    if isinstance(data, (dict, str, set, frozenset)):
+    if isinstance(data, (set, frozenset)):
         data: tuple = tuple(data)
+    if isinstance(data, dict):
+        if read_values_from_keys:
+            data: tuple = tuple(data.values())
+        else:
+            data: tuple = tuple(data)
     if start_index != 0 or stop_index is not None:
         data: list or tuple = data[start_index:stop_index]
 
