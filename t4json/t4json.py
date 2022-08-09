@@ -710,6 +710,14 @@ class T4Json:
         data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         return data[0][data[1]]
 
+    def multi_iter(self, var_count: int = 2, step: int = None, start_index: int = 0, stop_index: int = None,
+                   include_uneven: bool = False, uneven_placeholder: Any = None, path: str = '',
+                   ignore_errors: bool or None = None) -> zip or zip_longest or iter:
+        """This allows looping multiple variables through the data in FOR loops."""
+        return multi_iter(self.read(path=path, ignore_errors=ignore_errors), var_count=var_count,
+                          step=step, start_index=start_index, stop_index=stop_index,
+                          include_uneven=include_uneven, uneven_placeholder=uneven_placeholder)
+
     def pair(self, path: str, as_dictionary: bool = False, ignore_errors: bool = None) -> tuple or dict:
         """Returns a pair in the form of a tuple (<key>, <value>) or dictionary pair {<key>: <value>}
         from wherever *path* leads."""
@@ -1094,14 +1102,6 @@ class T4Json:
             return True
         else:
             return False
-
-    def multi_iter(self, var_count: int = 2, step: int = None, start_index: int = 0, stop_index: int = None,
-                   include_uneven: bool = False, uneven_placeholder: Any = None, path: str = '',
-                   ignore_errors: bool or None = None) -> zip or zip_longest or iter:
-        """This allows looping multiple variables through the data in FOR loops."""
-        return multi_iter(self.read(path=path, ignore_errors=ignore_errors), var_count=var_count,
-                          step=step, start_index=start_index, stop_index=stop_index,
-                          include_uneven=include_uneven, uneven_placeholder=uneven_placeholder)
 
     def types(self, path: str = '', ignore_errors: bool = None) -> set:
         """Returns a set of all the types on the current level (as defined by *path*)"""
