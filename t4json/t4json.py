@@ -87,11 +87,14 @@ class T4Json:
         else:
             del self.__data[self.__root][key]
 
+    def __iter__(self) -> iter:
+        return iter(self.__data[self.__root])
+
     def __len__(self) -> int:
         return len(self.__data[self.__root])
 
-    def __iter__(self) -> iter:
-        return iter(self.__data[self.__root])
+    def __sizeof__(self) -> int:
+        return self.__data[self.__root].__sizeof__()
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, T4Json):
@@ -210,6 +213,9 @@ class T4Json:
         except (KeyError, ValueError, TypeError):
             raise KeyPathError(f'\n`{other}` is a non-existent key or a non-existent value.')
         return T4Json().new(data)
+
+    def __contains__(self, item):
+        return str(item)[1:-1] in str(self.__data[self.__root])
 
     def add(self, value: dict or list or str or float or int or bool or None, path: str = '', existing_keys: str = 'replace',
             create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False,
