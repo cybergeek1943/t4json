@@ -11,7 +11,7 @@
 """Check out the docs here: https://cybergeek1943.github.io/t4json/"""
 import json
 from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth, HTTPProxyAuth
-from typing import Any, KeysView, Collection
+from typing import Any, KeysView
 from copy import deepcopy, copy
 from itertools import zip_longest
 
@@ -90,6 +90,9 @@ class T4Json:
     def __iter__(self) -> iter:
         return iter(self.__data[self.__root])
 
+    def __contains__(self, item):
+        return item in self.__data[self.__root]
+
     def __len__(self) -> int:
         return len(self.__data[self.__root])
 
@@ -101,30 +104,6 @@ class T4Json:
             return self.__data[self.__root] == other.data
         else:
             return self.__data[self.__root] == other
-
-    def __gt__(self, other: Any) -> bool:
-        if isinstance(other, T4Json):
-            return len(self.__data[self.__root]) > len(other.data)
-        else:
-            return len(self.__data[self.__root]) > len(other)
-
-    def __lt__(self, other: Any) -> bool:
-        if isinstance(other, T4Json):
-            return len(self.__data[self.__root]) < len(other.data)
-        else:
-            return len(self.__data[self.__root]) < len(other)
-
-    def __ge__(self, other: Any) -> bool:
-        if isinstance(other, T4Json):
-            return len(self.__data[self.__root]) >= len(other.data)
-        else:
-            return len(self.__data[self.__root]) >= len(other)
-
-    def __le__(self, other: Any) -> bool:
-        if isinstance(other, T4Json):
-            return len(self.__data[self.__root]) <= len(other.data)
-        else:
-            return len(self.__data[self.__root]) <= len(other)
 
     def __iadd__(self, other: Any) -> 'T4Json':
         if isinstance(other, T4Json):
@@ -213,9 +192,6 @@ class T4Json:
         except (KeyError, ValueError, TypeError):
             raise KeyPathError(f'\n`{other}` is a non-existent key or a non-existent value.')
         return T4Json().new(data)
-
-    def __contains__(self, item):
-        return str(item)[1:-1] in str(self.__data[self.__root])
 
     def add(self, value: dict or list or str or float or int or bool or None, path: str = '', existing_keys: str = 'replace',
             create: bool = False, index: int or str or None = None, integrate_list_with_list: bool = False,
@@ -320,15 +296,6 @@ class T4Json:
         """Changes the value of the key/index that *path* leads to."""
         data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data[0][data[1]] = new_value
-
-        if self.is_path_relative(path):
-            path: str = self.__interpret_path(path, return_as_str=True)  # in-case <path> is relative
-        if self.__working_level.startswith(path):
-            if self.__path_separator in path:
-                self.set_working_level(self.__path_separator.join(path.split(self.__path_separator)[:-1]))
-            else:
-                self.set_working_level(path='')
-
         return self
 
     def change_key(self, path: str, new_key: str or int or float or bool or None, existing_key: str = 'error',
@@ -352,12 +319,6 @@ class T4Json:
 
                 if new_key not in data[0]:
                     data[0][new_key] = data[0].pop(data[1])  # replaces key in dict with new key while keeping the value
-
-                    if self.__working_level.startswith(path):  # TODO: test this
-                        new_working_level = self.__working_level.split(self.__path_separator)
-                        new_working_level[len(path.split(self.__path_separator)) - 1] = new_key
-                        self.set_working_level(path=self.__path_separator.join(new_working_level))
-
                 else:  # if a key does already exist with the same name
                     if existing_key in ('combine', 'integrate', 'replace', 'pass'):
 
@@ -378,24 +339,21 @@ class T4Json:
                         elif existing_key == 'pass':
                             return self
 
-                        if self.__working_level.startswith(new_path) or self.__working_level.startswith(path):
-                            self.set_working_level(path=new_path)
-
                         self.delete(path)
                     elif existing_key == 'error':
                         self.__raise_error(ArgumentError('\n\n<new_key> is already being used on this level.'
-                                                           '\n\nSet the <existing_key> argument to "combine" so that '
-                                                           'the values will be combined into a list.\nSet the '
-                                                           '<existing_key> argument to "integrate" so that the values '
-                                                           'will be integrated with each other.\nSet the '
-                                                           '<existing_key> argument to "replace" so that that the '
-                                                           'key that already exists will have its value be replaced.'
-                                                           '\nSet the <existing_key> argument to "pass" so that that '
-                                                           'the key that already exists will have its value be '
-                                                           'replaced by the key being renamed.'), ignore_errors)
+                                                         '\n\nSet the <existing_key> argument to "combine" so that '
+                                                         'the values will be combined into a list.\nSet the '
+                                                         '<existing_key> argument to "integrate" so that the values '
+                                                         'will be integrated with each other.\nSet the '
+                                                         '<existing_key> argument to "replace" so that that the '
+                                                         'key that already exists will have its value be replaced.'
+                                                         '\nSet the <existing_key> argument to "pass" so that that '
+                                                         'the key that already exists will have its value be '
+                                                         'replaced by the key being renamed.'), ignore_errors)
                     else:
                         self.__raise_error(ArgumentError('<existing_pair> argument must be equal to "combine", '
-                                                           '"integrate", "replace", "pass" or "error".'), ignore_errors)
+                                                         '"integrate", "replace", "pass" or "error".'), ignore_errors)
 
             return self
         except (IndexError, TypeError):
@@ -426,12 +384,6 @@ class T4Json:
             # main
             data: tuple = self.__walk_path(path=path)
             out: dict or str or list or int or float or bool or None = data[0].pop(data[1])
-
-            if self.__working_level.startswith(path):
-                if self.__path_separator in path:
-                    self.set_working_level(self.__path_separator.join(path.split(self.__path_separator)[:-1]))
-                else:
-                    self.set_working_level(path='')
 
             return out, data[1], data[0]
 
@@ -500,12 +452,6 @@ class T4Json:
         # main
         data: tuple = self.__walk_path(path=path, ignore_path_errors=ignore_errors)
         data[0].pop(data[1])
-
-        if self.__working_level.startswith(path):
-            if self.__path_separator in path:
-                self.set_working_level(self.__path_separator.join(path.split(self.__path_separator)[:-1]))
-            else:
-                self.set_working_level(path='')
 
         return self
 
@@ -661,6 +607,7 @@ class T4Json:
                                         index_holder += 1
                                 recursive_func()
                                 return  # to break out of nested loop
+
             recursive_func()
         elif isinstance(container, list):
             def recursive_func() -> None:
@@ -718,7 +665,8 @@ class T4Json:
 
     def multi_iter(self, var_count: int = 2, step: int = None, start_index: int = 0, stop_index: int = None,
                    include_uneven: bool = False, uneven_placeholder: Any = None, path: str = '',
-                   read_values_from_keys: bool = False, ignore_errors: bool or None = None) -> zip or zip_longest or iter:
+                   read_values_from_keys: bool = False,
+                   ignore_errors: bool or None = None) -> zip or zip_longest or iter:
         """This allows looping multiple variables through the data in FOR loops."""
         return multi_iter(self.read(path=path, ignore_errors=ignore_errors), var_count=var_count,
                           step=step, start_index=start_index, stop_index=stop_index,
@@ -918,8 +866,7 @@ class T4Json:
             return data.read(path=key)
 
         except (KeyPathError, AddError):
-            data.__raise_error(KeyPathError(f'The key "{key}" could not be found.'),
-                               ignore_errors)
+            data.__raise_error(KeyPathError(f'The key "{key}" could not be found.'), ignore_errors)
         except AttributeError:
             pass
 
