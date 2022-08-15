@@ -1,6 +1,6 @@
 ![GitHub Workflow Status](https://raw.githubusercontent.com/cybergeek1943/badges/main/build-passing.svg) ![contributions welcome](https://raw.githubusercontent.com/cybergeek1943/badges/main/contributions-welcome.svg)
 
-The t4json module was created to make working with [JSON](https://www.json.org/json-en.html) data in python easier. It provides a bunch of tools to seamlessly open, __edit__ and save JSON data. The JSON data is first [deserialized](https://en.wikipedia.org/wiki/Serialization) and stored in an attribute of the T4Json class... this way you can work with the deserialized data directly... just as you would with the standard json module. The tools provided by t4json have tons of features so that you can do really specific things... if you only want to read a few values from some simple json data you might as well use the standard json module.
+The t4json module was created to make working with [JSON](https://www.json.org/json-en.html) data in python easier. It provides a bunch of tools to seamlessly open, __edit__ and save JSON data. The JSON data is first [deserialized](https://en.wikipedia.org/wiki/Serialization) and stored in an attribute of the T4Json class... this way you can work with the deserialized data directly... just as you would with the standard json module. The tools provided by t4json have tons of features so that you can do really specific things... if you only want to read a few values from some simple json data, then you might as well use the standard json module.
 
 This module should work on any installation of python 3.6
 or later on any OS right out of the box.
@@ -39,6 +39,7 @@ Try to keep this package up to date... this project is under active development 
 ### Notes
 - Since v1.4.0, slicing operations are supported on T4Json instances. They can be used to delete, change and read values. Paths may also be used in the first slice to walk up a level. &emsp; Also, inplace/non-inplace adding and subtracting are supported for adding new items/pairs or removing items/pairs in bunches. &emsp; Iterating through T4Json instances is also now supported.
 - All methods (where applicable) within the T4Json class will return un-copied mutable data. This is so that you can access the data and manipulate it just as you would if you were using the json module. You can use the built in ```copy()``` method of the returned mutable data to make a shallow copy… or you can use the copy module to make a deep copy. You can access the deserialized data through the ```data``` property of the T4Json class.
+- Many of the methods and functions in t4json have a lot of arguments... So _key-word arguments_ may have to be used a lot of the time depending on what you are trying to do.
 - Feel free to open it up and change some default arguments of the methods. If an argument looks like ```<parameter name>: <expected value> = None``` then that default argument needs to be changed with the attributes in the ```__init__()``` method of the T4Json class. __If__ the expected value/s has ```None``` in it like ```<parameter name>:<some expected value> | None = None```. In that case just change the default value of that parameter from ```None``` to something else if the arguments expected values allow it. Any 'flagged' T4Json methods or variables that look like ```__<name of method or var>__``` are not safe to tamper with as they are used by the T4Json class for processing the json data…
 
 &emsp;
@@ -49,10 +50,10 @@ Try to keep this package up to date... this project is under active development 
 - A **value** is anything that has a corresponding key or index.
 - A **key** is a string that is used to gain access to a value within a pair container.
 - An **index** is an integer that is used to gain access to a value within a list container.
-- An **item** is a non-container __value__.
+- An **item** is a non-pair __value__.
 - A **pair container** is a dictionary.
 - A **list container** is simply a list.
-- If a path is set to an empty string ""… it is accessing the base container.
+- If a path is an empty string ""… it is accessing the base container.
 
 &emsp;
 
@@ -92,7 +93,7 @@ null | <--------------> | None
 
 ### Overview of Global Functions
 
-
+* ```multi_iter()```
 * ```is_valid_json_data()```
 * ```convert_to_valid_json_ready_data()```
 * ```serialize_to_string()```
@@ -122,6 +123,7 @@ __Editing Methods__
 
 __Reading Methods__
 * ```read()```
+* ```multi_iter()```
 * ```pair()```
 * ```pairs()```
 * ```key()```
@@ -340,13 +342,50 @@ ___delete_empty_containers___ - Once the flatting is all done and dusted and if 
 
 &emsp;
 ___
-
 #### Reading Methods:
 ###### _T4Json._ ```read(path='')```
 Returns the value of wherever ```path``` leads.
 
 ___path___ Leads to the key that will have its value be returned.
 
+&emsp;
+###### _T4Json._ ```multi_iter(var_count=2, step=None, start_index=0, stop_index=None, include_uneven=False, uneven_placeholder=None, path: str = '', read_values_from_keys=False)```
+This method makes it possible to loop multiple variables through the data in a ```for``` loop.
+
+___var_count___ is the number of _variables_ that will be in the ```for``` loop.
+
+___step___ is the number of _items_ you want to skip over when iterating. Which by default is ```None``` and is equivalent to being the same number that **_var_count_** is in order to sequentially iterate the variables through the data.
+
+___start_index___ is the beginning index which is where the variables start iterating.
+
+___start_index___ is the ending index which is where the variables stop iterating.
+
+___include_uneven___ when set to ```True``` will add in filler values for the remaining _items_ in the _data_ if the _data_ is unevenly divided by the number of variables (**_var_count_**) being iterated through it. The default filler value is ```None```.
+
+___uneven_placeholder___ is the _filler value_ when for when the _data_ is not evenly divided by the number variables (**_var_count_**) being iterated through it.
+
+___path___ Leads to the data that will be iterated through.
+
+___read_values_from_keys___ when set to ```True``` the **values** instead of the **keys** of mapping data will be iterated through.
+
+&emsp;
+
+Example:
+```python
+data = T4Json([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+for x, y, z in data.multi_iter(var_count=3):
+    print(x, y, z)
+```
+Output:
+```
+1 2 3
+4 5 6
+7 8 9
+10 11 12
+```
+
+&emsp;
 
 &emsp;
 ###### _T4Json._ ```json_string(path='', indent=None, sort_keys=None, only_ascii=None, separators=None)```
@@ -643,7 +682,7 @@ ___separators___ Must be a tuple with two items. The fist is used to separate pa
 ###### _T4Json._ ```save_as(file_path, overwrite=False, indent=None, sort_keys=None, only_ascii=None, separators=None)```
 Save the JSON data as a new file.
 
-___file_path__ Is the new file name which can include a path to wherever you want to place it.
+___file_path___ Is the new file name which can include a path to wherever you want to place it.
 
 ___overwrite___ When set to ```True``` and ```file_path``` already exist then the already existing file will have its contents overwritten.
 
@@ -730,6 +769,47 @@ Checks to see if ___path___ is considered a path in the current T4Json instance.
 ___
 
 ## Global Functions
+
+
+###### _T4Json._ ```multi_iter(data, var_count=2, step=None, start_index=0, stop_index=None, include_uneven=False, uneven_placeholder=None, path: str = '', read_values_from_keys=False)```
+This function makes it possible to loop multiple variables through _data_ in a ```for``` loop.
+
+___data___ is the data that you want to loop through. You can pass a _list_, _tuple_, _str_, _T4Json_, _dict_, _set_, or _frozenset_.
+
+___var_count___ is the number of _variables_ that will be in the ```for``` loop.
+
+___step___ is the number of _items_ you want to skip over when iterating. Which by default is ```None``` and is equivalent to being the same number that **_var_count_** is in order to sequentially iterate the variables through the data.
+
+___start_index___ is the beginning index which is where the variables start iterating.
+
+___start_index___ is the ending index which is where the variables stop iterating.
+
+___include_uneven___ when set to ```True``` will add in filler values for the remaining _items_ in the _data_ if the _data_ is unevenly divided by the number of variables (**_var_count_**) being iterated through it. The default filler value is ```None```.
+
+___uneven_placeholder___ is the _filler value_ when for when the _data_ is not evenly divided by the number variables (**_var_count_**) being iterated through it.
+
+___read_values_from_keys___ when set to ```True``` the **values** instead of the **keys** of mapping data will be iterated through.
+
+&emsp;
+
+Example:
+```python
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+for x, y, z in multi_iter(data, var_count=3):
+    print(x, y, z)
+```
+Output:
+```
+1 2 3
+4 5 6
+7 8 9
+10 11 12
+```
+
+&emsp;
+
+&emsp;
 ###### ```is_valid_json_data(source)```
 This function returns ```True``` if the JSON data is valid. Otherwise, it returns ```False```.
 
@@ -765,6 +845,62 @@ Loads Json data from a _string_ and returns the python data structure.
 ___string___ must be passed a _String_ of serialized json data.
 
 
+&emsp;
+
+&emsp;
+___
+
+## Slicing Operations
+Data in T4Json instances can be edited using slicing operations. This can be really useful if you don't want to use the _T4Json_.methods().
+
+Reading:
+```python
+>>> data = T4Json({'phone': {'area': 503, 'middle': 464, 'last': 9787}})
+>>> data['phone']['area']
+501
+```
+
+Adding / Changing:
+```python
+>>> data = T4Json({'phone': {'area': 503, 'middle': 464, 'last': 9787}})
+>>> data['phone']['area'] = [5, 0, 3]
+>>> data
+{'phone': {'area': [5, 0, 3], 'middle': 464, 'last': 9787}}
+```
+
+Deleting:
+```python
+>>> data = T4Json({'phone': {'area': 503, 'middle': 464, 'last': 9787}})
+>>> del data['phone']['area']
+>>> data
+{'phone': {'middle': 464, 'last': 9787}}
+```
+
+We can also use paths within our slices (if it is the first slice) to easily access deep levels (using relative paths, if needed). For example:
+
+```python
+>>> starting_data = {
+...     "internet": {
+...         "airplane mode": False,
+...         "wifi": [True, {"known": ["home", "office"]}],
+...         "wifi calling": False,
+...         "mobile hotspot": False}
+... }
+>>> 
+>>> data = T4Json(starting_data)
+>>> data.set_working_level(r'internet\\wifi\\1')
+>>> data[r'..\\..']['wifi'] = 404
+>>> data
+{
+    "internet": {
+        "airplane mode": False,
+        "wifi": 404,
+        "wifi calling": False,
+        "mobile hotspot": False
+    }
+}
+```
+
 
 &emsp;
 
@@ -773,17 +909,17 @@ ___
 
 ## Examples
 ### Loading the Data
-Note - ( Each one of the examples below is all by itself. )
-To load json data simply pass the data in when initializing the t4json object. Examples:
+To load json data simply pass the data in when initializing the t4json object.
 
+Loading a **File**:
 ```python
 data = T4Json('example.json')
 ```
-OR
+Loading from a **URL/Endpoint**:
 ```python
 data = T4Json('https://api.github.com/users?since=100')
 ```
-OR
+Loading from a **string**:
 ```python
 json_data = """{
 "name": "John"
@@ -793,21 +929,21 @@ json_data = """{
 }"""
 data = T4Json(json_data)
 ```
-If you want to load json data later or have already loaded json data and want to load something else then just call one of the load methods like so - ```data.load("new_example.json")```.
+Loading from a **dict/list**:
+```python
+dictionary = {'new_data': 512}
+data = T4Json(dictionary)
+```
+If you want to load new data into the same T4Json instance after you have already loaded data - ```data.load("new_example.json")```.
 
 If you want to start with a clean slate and create json data from scratch then:
 ```python
 data = T4Json()
 # start adding items here
 ```
-By default, when creating new json data, the initial data is just an empty dictionary. If you want to specify the starting data to work with… pass it to the ```new()``` method:
-```python
-fresh_start = {'version': 1.0}
-data = T4Json()
-data.new(fresh_start)
-# start adding items here
-```
-Note - ( The ```new()``` method will simply create an empty dictionary if nothing is passed to it. )
+
+
+&emsp;
 
 &emsp;
 ### Using Paths to Navigate the Data
@@ -837,7 +973,7 @@ Here is the json data in a file we will call ```settings.json```:
   }
 }
 ```
-Note - ( The default path separator is '\\\\' - two back slashes - make sure that the fist backslash is not escaped by the second backslash. This can be done by prefixing the string with an 'r'. You can change the path separator properties using the ```set_path_separator_properties()``` method. )
+Note - ( The default path separator is '\\' - two back slashes - make sure that the fist backslash is not escaped by the second backslash. This can be done by prefixing the string with an 'r' or by using '\\\\' as the seperator. You can change the path separator properties using the ```set_path_separator_properties()``` method. )
 
 Here is some code being run in the terminal using paths to navigate the data. It shows the difference between absolute vs relative paths. 
 
@@ -875,6 +1011,7 @@ Note - (There can be a separator at the beginning of the path if you want it. So
 Using these relative paths we not only can read but can do all sorts of edits easily and without the hassle of always having to walk down the path of nested data.
 
 
+&emsp;
 
 &emsp;
 ### Searching the Data
@@ -903,13 +1040,24 @@ Look at the json data from the [URL](https://mdn.github.io/learning-area/javascr
 
 
 &emsp;
+
+&emsp;
 ### Flattening Nested Data
-Flattening [nested data](https://en.wikipedia.org/wiki/Nesting_(computing)) is turning something like this ```[[1, 2, 3, [4, 5]], 6, 7, 8]``` into this ```[1, 2, 3, 4, 5, 6, 7, 8]```. Nested data can be flattened using the _T4Json_.```flatten()``` method. Below is an example of flattening some data from this [URL](https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json).
+Flattening [nested data](https://en.wikipedia.org/wiki/Nesting_(computing)) is turning something like this ```[[1, 2, 3, [4, 5]], 6, 7, 8]``` into this ```[1, 2, 3, 4, 5, 6, 7, 8]```. Nested data can be flattened using the _T4Json_.```flatten()``` method. 
+
+There are basically, two different ways that T4Json data can be flattened:
+1. **Grounding:** All the kay/value pairs (that do not contain containers as values) are moved to the base level. Any key/value pairs that have the same keys get their values combined or replaced.
+2. **Chaining:** All the keys get chained togather. The values (that are not containers) remain the same.
+
+
+&emsp;
+#### Grounding:
+We will be using the data from this [URL](https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json) as example data.
 
 ```python
 >>> data = T4Json('https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json')
 >>> data.flatten()
->>> data.read()
+>>> data
 ```
 Look at the original json data from the [URL](https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json) and compare it with the flattened data below.
 ```json
@@ -951,6 +1099,63 @@ Look at the original json data from the [URL](https://mdn.github.io/learning-are
 ```
 
 
+&emsp;
+#### Chaining:
+We will be using this data as an example:
+```json
+{
+  "internet": {
+      "airplane mode": false,
+      "wifi": [true, {"known": ["home", "office"]}],
+      "wifi calling": false,
+      "mobile hotspot": false
+  },
+  "bluetooth": [true, {"paired": ["headphones", "laptop"]}],
+  "sound": {
+    "volume": 65, "vibration": true,
+    "ringtone": "guitar", "notification": "ping"
+  },
+  "display": {
+    "brightness": {"auto": true, "level": 80},
+    "wallpaper": "trees",
+    "navigation bar": "gesture",
+    "font": 70,
+    "timeout time": 30
+  }
+}
+```
+
+We will then run the fallowing code to flatten the data:
+```python
+>>> data = T4Json('example.json')
+>>> data.flatten(chain_keys=True)
+>>> data
+```
+
+And here is the result:
+```json
+{
+  "bluetooth": [true],
+  "internet_airplane mode": false,
+  "internet_wifi": [true],
+  "internet_wifi calling": false,
+  "internet_mobile hotspot": false,
+  "sound_volume": 65,
+  "sound_vibration": true,
+  "sound_ringtone": "guitar",
+  "sound_notification": "ping",
+  "display_wallpaper": "trees",
+  "display_navigation bar": "gesture",
+  "display_font": 70,
+  "display_timeout time": 30,
+  "bluetooth_paired": ["headphones", "laptop"],
+  "internet_wifi_known": ["home", "office"],
+  "display_brightness_auto": true,
+  "display_brightness_level": 80
+}
+```
+Note - when there is only one item in a list such as ```{"bluetooth": [true]}``` from above, you can set the parameter ```convert_singular_lists``` of the ```flatten()``` method to ```True``` and the output will be ```{"bluetooth": true}``` instead of ```{"bluetooth": [true]}```.
+
 
 &emsp;
 
@@ -964,6 +1169,12 @@ The only third party dependency is the "request" module.
 ___
 
 ## Change Log - Latest Fixes & Improvements
+
+### v1.4.3
+* Added ```multi_iter()``` method to T4Json instance so that multiple variables can be looped through the data at the same time.
+* Also added ```multi_iter()``` as a global function.
+* Cleaned up code and made it a just a bit faster.
+* The dunder methods of the T4Json class were improved.
 
 ### v1.4.2
 * Added ```types()``` method to T4Json instance.
