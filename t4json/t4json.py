@@ -542,7 +542,6 @@ class T4Json:
                 ignore=ignore_errors)
         if self.is_path_relative(path):
             path: str = self.__interpret_path(path=path, return_as_str=True)
-        self.set_working_level(path='')
 
         # main
         data: tuple = self.__walk_path(path)
