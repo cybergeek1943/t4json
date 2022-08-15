@@ -65,6 +65,9 @@ class T4Json:
     def __str__(self) -> str:
         return self.pprint(print_to_console=False)
 
+    def __repr__(self) -> str:
+        return self.pprint(print_to_console=False)
+
     def __getitem__(self, item: Any) -> dict or list or str or float or int or bool or None:
         if self.is_path(path=str(item)):
             return self.read(item)
