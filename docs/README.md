@@ -1173,7 +1173,7 @@ ___
 ### v1.4.3
 * Added ```multi_iter()``` method to T4Json instance so that multiple variables can be looped through the data at the same time.
 * Also added ```multi_iter()``` as a global function.
-* Cleaned up code and made it a just a bit faster.
+* Cleaned up code and made it just a bit faster.
 * The dunder methods of the T4Json class were improved.
 
 ### v1.4.2
