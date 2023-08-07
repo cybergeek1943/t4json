@@ -1,6 +1,6 @@
 ![GitHub Workflow Status](https://raw.githubusercontent.com/cybergeek1943/badges/main/build-passing.svg) ![contributions welcome](https://raw.githubusercontent.com/cybergeek1943/badges/main/contributions-welcome.svg)
 
-### This entire project is being rewritten!
+### NOTICE: This entire project is being rewritten!
 The API will remain very similar, but pretty much the entire backend is being redone. There will be many new features and huge performance gains. The release should be sometime this year. 
 
 The t4json module was created to make working with [JSON](https://www.json.org/json-en.html) data in Python easier. It provides a bunch of tools to seamlessly open, __edit__ and save JSON data. The tools provided by t4json have tons of features so that you can do really specific things... if you only want to read a few values from some flat simple JSON data, then you might as well use the standard json module.
