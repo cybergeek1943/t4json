@@ -1,6 +1,6 @@
 ![GitHub Workflow Status](https://raw.githubusercontent.com/cybergeek1943/badges/main/build-passing.svg) ![contributions welcome](https://raw.githubusercontent.com/cybergeek1943/badges/main/contributions-welcome.svg)
 
-### NOTICE: This entire project is being rewritten!
+### NOTICE: Much of this project is being completely revamped!
 The API will remain very similar, but the entire backend is being rewritten. There will be many new features and substantial performance gains. The release should be sometime this year. 
 
 &emsp;
