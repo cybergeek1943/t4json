@@ -84,7 +84,7 @@ data = T4Json()
 
 &emsp;
 ### Using Paths to Navigate the Data
-Note - ( This section assumes familiarity with absolute/relative paths within the file system. )
+Note - ( This section assumes familiarity with absolute/relative paths. )
 Once the data is loaded you can navigate it using paths - similar to a file/directory path. If you are working in some nested part of the data then you can set that as the current working level to make it easier to read/edit the data in there. For example:
 Here is the json data in a file we will call ```settings.json```:
 ```json
